@@ -10,10 +10,10 @@
 
 ```bash
 # 1. 執行 Bootstrap（3 分鐘）
-curl -fsSL https://raw.githubusercontent.com/u88803494/mac-dev-setup/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/u88803494/my-mac-dev-setup/main/bootstrap.sh | bash
 
 # 2. Clone 此 repo
-git clone https://github.com/u88803494/mac-dev-setup.git ~/personal/mac-dev-setup
+git clone https://github.com/u88803494/my-mac-dev-setup.git ~/personal/mac-dev-setup
 cd ~/personal/mac-dev-setup
 
 # 3. 讓 Claude Code AI 完成剩下的設定（5 分鐘）
@@ -97,10 +97,10 @@ Claude Code 讀取 `SETUP_PROMPT.md` 並執行：
 
 ```bash
 # 1. 執行 bootstrap
-curl -fsSL https://raw.githubusercontent.com/u88803494/mac-dev-setup/main/bootstrap.sh | bash
+curl -fsSL https://raw.githubusercontent.com/u88803494/my-mac-dev-setup/main/bootstrap.sh | bash
 
 # 2. Clone repo
-git clone https://github.com/u88803494/mac-dev-setup.git ~/personal/mac-dev-setup
+git clone https://github.com/u88803494/my-mac-dev-setup.git ~/personal/mac-dev-setup
 cd ~/personal/mac-dev-setup
 
 # 3. 執行個別腳本

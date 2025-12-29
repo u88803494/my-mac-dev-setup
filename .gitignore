@@ -12,3 +12,11 @@
 *.tmp
 *.temp
 *~
+
+# Local environment variables and secrets
+.zshrc.local
+.env.local
+*.env.local
+
+# Setup reports
+setup-report.md

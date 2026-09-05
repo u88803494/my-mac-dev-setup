@@ -3,17 +3,11 @@
     email = WORK_EMAIL_HERE
 
 [core]
-    editor = vim
-    autocrlf = input
-
-[init]
-    defaultBranch = main
-
-[pull]
-    rebase = false
+    excludesfile = ~/.gitignore_global
+    quotepath = false
 
 [push]
-    default = simple
+    autoSetupRemote = true
 
 [alias]
     st = status

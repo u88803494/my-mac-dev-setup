@@ -6,3 +6,11 @@
 	quotepath = false
 [push]
 	autoSetupRemote = true
+[alias]
+	st = status
+	co = checkout
+	br = branch
+	ci = commit
+	unstage = reset HEAD --
+	last = log -1 HEAD
+	visual = log --graph --oneline --all

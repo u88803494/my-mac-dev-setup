@@ -211,10 +211,15 @@ echo "✅ Verification complete!"
 
 **User should:**
 1. Restart terminal (or run `source ~/.zshrc`)
-2. Configure Git identity:
+2. Git identity (name/email/aliases) is **already set** — Task 4
+   (`restore-dotfiles.sh`) restored `config/shell/.gitconfig`, which has the
+   personal identity baked in. Only run this if you want to **switch** to a
+   different identity (e.g. a work email for one context):
    ```bash
    bash git/setup-git.sh
    ```
+   `config/shell/.gitconfig` and `git/.gitconfig.personal` are kept in sync —
+   if you change one, update the other so they don't drift apart again.
 3. Confirm `~/.zshrc.local` has real API key values (not placeholders)
 4. Verify all tools work correctly
 

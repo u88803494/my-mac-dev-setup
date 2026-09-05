@@ -274,6 +274,12 @@ export SUPABASE_ACCESS_TOKEN="your-token"
 
 ## ⚙️ Git 配置
 
+**身份（name/email）已經在 `SETUP_PROMPT.md` Task 4 自動設好**——
+`scripts/restore-dotfiles.sh` 會把 `config/shell/.gitconfig` 還原成
+`~/.gitconfig`，內含個人身份、alias、delta pager 等全部設定，不需要額外操作。
+
+`git/setup-git.sh` 只在你想**切換身份**（例如某段時間要用工作 email）才需要：
+
 ```bash
 ./git/setup-git.sh
 ```
@@ -283,10 +289,13 @@ export SUPABASE_ACCESS_TOKEN="your-token"
 2. **Work** - 公司 email
 3. **Manual** - 手動設定
 
-**功能**：
-- Git Delta pager（彩色 diff）
-- 條件式 gitconfig（工作/個人專案自動切換）
-- Auto setup remote
+**目前實際擁有的功能**：
+- Git Delta pager（彩色 diff，`[core] pager = delta`）
+- Git alias（`st`/`co`/`br`/`ci`/`unstage`/`last`/`visual`）
+- Auto setup remote（`push.autoSetupRemote`）
+
+⚠️ 這裡**沒有**條件式 gitconfig（`includeIf` 依資料夾自動切換身份）——
+`setup-git.sh` 是整份覆寫 `~/.gitconfig`，不是依專案路徑自動判斷。
 
 ---
 

@@ -91,7 +91,7 @@ defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
 - 關注點分離：框架 vs. 使用者偏好
 
 ### 6. Python 工具預設註解
-**決策**：在 `dev-tools.sh` 中註解 `pipx` 和 `uv`
+**決策**：在 `brew.sh` + Brewfile 中註解 `pipx` 和 `uv`
 
 **理由**：
 - 使用者有 M1 MacBook Air 128GB（空間受限）

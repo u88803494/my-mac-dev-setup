@@ -12,6 +12,12 @@
 
 **Your Mission**: Complete the remaining setup tasks to create a fully configured development environment.
 
+**⚠️ Read these first**:
+- `MIGRATION_PLAN.md` — the full migration plan, including what deliberately should NOT be carried over from the old machine
+- `Brewfile` — the curated package list for the new machine. Commented-out entries are intentional; do not uncomment without asking the user.
+
+**Key rule**: use **mise** for version management. Do **not** install nvm — the old machine had both, and they conflict.
+
 ---
 
 ## Setup Tasks
@@ -107,32 +113,49 @@ brew install zsh-autosuggestions zsh-syntax-highlighting
 
 ---
 
-### 2. Development Tools
+### 2. Development Tools & GUI Applications (Brewfile)
 
-**Install modern CLI tools:**
+Everything — CLI tools, casks, and VS Code extensions — comes from one file:
+
 ```bash
-brew install eza zoxide gh git-delta
+brew bundle --file=Brewfile
 ```
 
-**Explanation:**
-- `eza`: Modern replacement for `ls` (used by `t()` function)
-- `zoxide`: Smart directory jumper (used by `j` alias)
-- `gh`: GitHub CLI
-- `git-delta`: Better git diff viewer
+**Do not** install packages individually. If something is missing, add it to `Brewfile`
+and re-run, so the repo stays the single source of truth.
+
+Key dependencies the shell config relies on (already in `Brewfile`):
+- `eza`: `ls` replacement, required by the `t()` function
+- `zoxide`: smart directory jumper, required by the `j` alias
+- `gh`, `git-delta`: Git toolchain
+- `font-meslo-lg-nerd-font`: required by Powerlevel10k
 
 ---
 
-### 3. GUI Applications
+### 3. Restore dotfiles
 
-**Install via Homebrew Cask:**
 ```bash
-brew install --cask iterm2 visual-studio-code
+bash scripts/restore-dotfiles.sh
+```
+
+This copies `config/shell/.zshrc`, `.zprofile`, `.gitconfig`, `.gitignore_global`
+and `config/.p10k.zsh` into `$HOME`, backing up any existing file as `*.pre-migration`.
+
+Use `config/shell/.zshrc` (the cleaned version), **not** `.zshrc.old-machine`
+— the latter is kept only as a reference for what was removed.
+
+Then create the secrets file (values come from the user's password manager — never
+generate or guess them):
+
+```bash
+cp config/shell/.zshrc.local.example ~/.zshrc.local
+chmod 600 ~/.zshrc.local
 ```
 
 **Configure iTerm2 preferences sync:**
 ```bash
 # Set custom preferences folder
-defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$HOME/personal/mac-dev-setup/config/iterm2"
+defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$HOME/Developer/Personal/my-mac-dev-setup/config/iterm2"
 defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
 ```
 
@@ -143,17 +166,17 @@ defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
 **Clone and link zsh-scripts repository:**
 ```bash
 # Create personal directory if it doesn't exist
-mkdir -p ~/personal
+mkdir -p ~/Developer/Personal
 
 # Clone zsh-scripts
-if [ -d ~/personal/zsh-scripts ]; then
+if [ -d ~/Developer/Personal/zsh-scripts ]; then
     echo "✅ zsh-scripts already cloned"
 else
-    git clone https://github.com/u88803494/zsh-scripts.git ~/personal/zsh-scripts
+    git clone https://github.com/u88803494/zsh-scripts.git ~/Developer/Personal/zsh-scripts
 fi
 
 # Create symlink
-ln -sf ~/personal/zsh-scripts ~/.oh-my-zsh/custom/zsh-scripts
+ln -sf ~/Developer/Personal/zsh-scripts ~/.oh-my-zsh/custom/zsh-scripts
 
 # Oh My Zsh will automatically load *.plugin.zsh files from custom directories
 ```
@@ -327,3 +350,22 @@ echo "✅ Verification complete!"
 2. Document in setup-report.md
 3. Suggest manual fixes
 4. Provide fallback options (use scripts/ directory)
+
+---
+
+## Final Steps
+
+### Apply macOS system preferences
+
+```bash
+bash scripts/macos-defaults.sh
+```
+
+Review the script with the user first — it changes Dock, Finder, keyboard repeat
+rate and screenshot location.
+
+### Verification
+
+Run the acceptance checklist in `MIGRATION_PLAN.md` §5 and report the result.
+Do not claim the setup is complete until every item passes; report failures with
+the actual command output.

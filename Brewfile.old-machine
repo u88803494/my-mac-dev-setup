@@ -1,0 +1,106 @@
+tap "amikai/tap"
+tap "olets/tap"
+# Interpreted, interactive, object-oriented programming language
+brew "python@3.13"
+# Shell extension to jump to frequently used directories
+brew "autojump"
+# Modern, maintained replacement for ls
+brew "eza"
+# Play, record, convert, and stream select audio and video codecs
+brew "ffmpeg"
+# Command-line fuzzy finder written in Go
+brew "fzf"
+# GitHub command-line tool
+brew "gh"
+# Distributed revision control system
+brew "git"
+# Syntax-highlighting pager for git and diff output
+brew "git-delta"
+# Polyglot runtime manager (asdf rust clone)
+brew "mise"
+# Manage multiple Node.js versions
+brew "nvm"
+# Execute binaries from Python packages in isolated environments
+brew "pipx"
+# Fast, disk space efficient package manager
+brew "pnpm"
+# PDF rendering library (based on the xpdf-3.0 code base)
+brew "poppler"
+# AI-powered command-line workflow tool for developers
+brew "qwen-code"
+# Rsync for cloud storage
+brew "rclone"
+# Terminal multiplexer
+brew "tmux"
+# Display directories as trees (with optional color/HTML output)
+brew "tree"
+# JavaScript package manager
+brew "yarn"
+# Feature-rich command-line audio/video downloader
+brew "yt-dlp"
+# Shell extension to navigate your filesystem faster
+brew "zoxide"
+# Menu bar tool to limit maximum charging percentage
+cask "aldente"
+# Agent orchestration platform
+cask "antigravity"
+# Terminal interface for Antigravity agents
+cask "antigravity-cli"
+# Terminal-based AI coding assistant
+cask "claude-code"
+# Desktop GUI for Aider AI pair programming
+cask "hotovo-aider-desk"
+# File system integration
+cask "macfuse"
+# MCP server for searching job listings across job boards and company career sites
+cask "amikai/tap/openings-mcp", trusted: true
+# Rust-based terminal
+cask "warp"
+vscode "aaron-bond.better-comments"
+vscode "avneeshagarwal.react-nextjs-snippets"
+vscode "bradlc.vscode-tailwindcss"
+vscode "chakrounanas.turbo-console-log"
+vscode "christian-kohler.npm-intellisense"
+vscode "christian-kohler.path-intellisense"
+vscode "clinyong.vscode-css-modules"
+vscode "codesandbox-io.codesandbox-projects"
+vscode "csstools.postcss"
+vscode "dbaeumer.vscode-eslint"
+vscode "dsznajder.es7-react-js-snippets"
+vscode "eamodio.gitlens"
+vscode "eriklynd.json-tools"
+vscode "esbenp.prettier-vscode"
+vscode "firsttris.vscode-jest-runner"
+vscode "formulahendry.auto-close-tag"
+vscode "formulahendry.auto-rename-tag"
+vscode "gruntfuggly.todo-tree"
+vscode "hb432.prettier-eslint-typescript"
+vscode "henriiik.vscode-sort"
+vscode "iceworks-team.iceworks-style-helper"
+vscode "jerryhong.autofilename"
+vscode "jock.svg"
+vscode "kameshkotwani.google-search"
+vscode "mikestead.dotenv"
+vscode "ms-azuretools.vscode-containers"
+vscode "ms-azuretools.vscode-docker"
+vscode "ms-vscode-remote.remote-containers"
+vscode "ms-vscode-remote.remote-ssh"
+vscode "ms-vscode-remote.remote-ssh-edit"
+vscode "ms-vscode-remote.remote-wsl"
+vscode "ms-vscode.remote-explorer"
+vscode "ms-vscode.vscode-typescript-next"
+vscode "nrwl.angular-console"
+vscode "quicktype.quicktype"
+vscode "rvest.vs-code-prettier-eslint"
+vscode "standard.vscode-standard"
+vscode "streetsidesoftware.code-spell-checker"
+vscode "think2011.react-i18n"
+vscode "typescriptteam.native-preview"
+vscode "tyriar.sort-lines"
+vscode "vittorioromeo.expand-selection-to-scope"
+vscode "vscode-icons-team.vscode-icons"
+vscode "wakatime.vscode-wakatime"
+vscode "wix.vscode-import-cost"
+vscode "wmaurer.change-case"
+vscode "zainchen.json"
+npm "corepack"

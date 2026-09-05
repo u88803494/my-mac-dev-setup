@@ -215,20 +215,31 @@ rsync -av --progress ~/Documents ~/Desktop ~/Pictures ~/Movies /Volumes/HPSSD/ma
 
 ---
 
-## 6. 本 repo 需要修正的地方（順便做）
+## 6. 本 repo 的修正（✅ 已於 2026-09-05 完成）
 
-掃描發現目前 `my-mac-dev-setup` 與實際環境已脫節：
+掃描發現 `my-mac-dev-setup` 與實際環境脫節，已一併修正：
 
-- [ ] `README.md` 寫 clone 到 `~/personal/mac-dev-setup`，**實際是 `~/Developer/Personal/my-mac-dev-setup`**
-- [ ] `scripts/brew.sh` 只裝 pnpm → 應改為 `brew bundle --file=Brewfile`
-- [ ] `scripts/apps.sh` 只裝 3 個 app → 應由 Brewfile 統一管理
-- [ ] 缺少 `Brewfile`
-- [ ] 缺少 `config/vscode/`（settings.json + extensions.txt）
-- [ ] 缺少 `config/shell/`（.zshrc、.zprofile、.gitconfig）
-- [ ] 缺少 `config/mise/config.toml`
-- [ ] `.zshrc.local.example`（只有 key 名稱，不含值）沒有建立
-- [ ] `scripts/macos-defaults.sh`（系統偏好設定自動化）不存在
-- [ ] `SETUP_PROMPT.md` 需依本計劃更新
+- [x] `README.md` clone 路徑 `~/personal/mac-dev-setup` → `~/Developer/Personal/my-mac-dev-setup`
+      （同一批修正也套用到 SETUP_PROMPT.md、bootstrap.sh、config/*/README.md、.serena/memories/）
+- [x] `scripts/brew.sh` 改為 `brew bundle --file=Brewfile`
+- [x] `scripts/dev-tools.sh`、`scripts/apps.sh` 刪除，內容併入 Brewfile
+- [x] `scripts/node.sh` 由 nvm 改為 mise
+- [x] `scripts/symlink-zsh.sh` 路徑修正為 `${PERSONAL_DIR:-$HOME/Developer/Personal}/zsh-scripts`
+- [x] 新增 `Brewfile`（新機目標狀態，已淘汰項目註解並附原因）
+- [x] 新增 `Brewfile.old-machine`（舊機原樣快照，參考用）
+- [x] 新增 `config/vscode/`（settings.json + extensions.txt + snippets/）
+- [x] 新增 `config/shell/`（.zshrc 乾淨版、.zshrc.old-machine、.zprofile、.gitconfig、.gitignore_global）
+- [x] 新增 `config/shell/.zshrc.local.example`（只有 key 名稱，不含值）
+- [x] 新增 `config/mise/config.toml`
+- [x] 新增 `scripts/macos-defaults.sh`（依舊機實際設定：Dark、Dock autohide、tilesize 64、
+      Finder 路徑列＋狀態列＋清單檢視；另加截圖改存 ~/Pictures/Screenshots）
+- [x] 新增 `scripts/restore-dotfiles.sh`
+- [x] `setup.sh` 重寫為 7 步驟，移除 nvm
+- [x] `SETUP_PROMPT.md` 更新為 Brewfile 流程，並加上「不要裝 nvm」的明確指示
+
+**尚未決定、留給你確認的項目**（都在 `Brewfile` 內以註解標示）：
+`olets/tap`、`yarn`、`warp`、`antigravity`、`hotovo-aider-desk`、`macfuse`、
+`steam`、`downie`、`chatgpt`、`claude`（Desktop）、`openings-mcp`
 
 ---
 

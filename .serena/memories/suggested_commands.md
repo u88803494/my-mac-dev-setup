@@ -16,8 +16,7 @@
 ./scripts/zsh.sh           # Zsh 環境
 
 # 開發工具
-./scripts/dev-tools.sh     # Git 工具鏈 + 現代化 CLI
-./scripts/apps.sh          # GUI 應用程式
+./scripts/brew.sh          # Homebrew + Brewfile（CLI + GUI apps）
 
 # 配置
 ./scripts/iterm2-config.sh # iTerm2 同步
@@ -81,16 +80,16 @@ defaults read com.googlecode.iterm2 PrefsCustomFolder
 ### SuperClaude 設定
 ```bash
 # 備份當前設定到 repo
-cp ~/.claude/settings.json ~/personal/mac-dev-setup/config/claude/
+cp ~/.claude/settings.json ~/Developer/Personal/my-mac-dev-setup/config/claude/
 
 # 從 repo 恢復設定
-cp ~/personal/mac-dev-setup/config/claude/settings.json ~/.claude/
+cp ~/Developer/Personal/my-mac-dev-setup/config/claude/settings.json ~/.claude/
 ```
 
 ### Zsh 配置
 ```bash
 # 編輯自訂 aliases（在獨立 repo）
-cd ~/personal/zsh-scripts
+cd ~/Developer/Personal/zsh-scripts
 vim custom.plugin.zsh
 git commit && git push
 
@@ -181,7 +180,7 @@ p10k configure
 ### Zsh Scripts 找不到
 ```bash
 # 先 clone zsh-scripts repo
-git clone https://github.com/u88803494/zsh-scripts.git ~/personal/zsh-scripts
+git clone https://github.com/u88803494/zsh-scripts.git ~/Developer/Personal/zsh-scripts
 
 # 然後執行 symlink 腳本
 ./scripts/symlink-zsh.sh
@@ -209,7 +208,7 @@ SuperClaude install
 
 ### 添加新工具
 1. 決定：核心（scripts/）或可選（僅 README.md）
-2. 添加到適當的腳本（例如 `dev-tools.sh`）
+2. 添加到適當的腳本（例如 `brew.sh` + Brewfile）
 3. 更新 `cleanup.sh` 以移除它
 4. 更新 README.md 文檔
 

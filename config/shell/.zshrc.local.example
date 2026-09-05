@@ -1,0 +1,23 @@
+# ~/.zshrc.local — 本機秘密與環境變數
+#
+# ⚠️  這個檔案「絕對不要」進 git（.gitignore 已排除 .zshrc.local）
+# 新機設定步驟：
+#   1. cp config/shell/.zshrc.local.example ~/.zshrc.local
+#   2. 從密碼管理器逐一填入實際值
+#   3. chmod 600 ~/.zshrc.local
+
+# ─────────────────────────────────────────────
+# 目錄捷徑（zsh-scripts 的函式會用到）
+# ─────────────────────────────────────────────
+export PERSONAL_DIR="$HOME/Developer/Personal"
+export WORK_DIR="$HOME/Developer/Work"
+
+# ─────────────────────────────────────────────
+# API Keys — 值從密碼管理器取得
+# ─────────────────────────────────────────────
+export MORPH_API_KEY=""            # Morphllm MCP
+export TAVILY_API_KEY=""           # Tavily MCP（搜尋）
+export SUPABASE_ACCESS_TOKEN=""    # Supabase CLI
+
+# 專案層級的 key 放在各專案的 .env.local，不放這裡：
+#   GEMINI_API_KEY  → apps/my-website/.env.local

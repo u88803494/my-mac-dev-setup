@@ -1,59 +1,47 @@
 #!/bin/bash
+#
+# Node.js（透過 mise）
+# =====================
+# ⚠️  舊版本腳本用 nvm，已淘汰。
+#     新機一律使用 mise 管理版本，不要再裝 nvm（兩者並存會互相干擾）。
 
-# nvm + Node.js LTS Installation Script
-# =======================================
+set -e
 
-set -e  # Exit on error
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
-echo "📦 Installing nvm + Node.js LTS"
+echo "📦 Node.js via mise"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# Check if nvm is installed
-if [ -s "$HOME/.nvm/nvm.sh" ]; then
-    echo "✅ nvm already installed"
-    source "$HOME/.nvm/nvm.sh"
-    nvm --version
-else
-    echo "📥 Installing nvm..."
+if ! command -v mise &> /dev/null; then
+    echo "📥 安裝 mise..."
+    brew install mise
+fi
 
-    # Install nvm via Homebrew
-    brew install nvm
+eval "$(mise activate bash)"
 
-    # Create nvm directory
-    mkdir -p ~/.nvm
-
-    # Add nvm to shell configuration
-    if ! grep -q "NVM_DIR" ~/.zshrc 2>/dev/null; then
-        echo "" >> ~/.zshrc
-        echo "# nvm" >> ~/.zshrc
-        echo 'export NVM_DIR="$HOME/.nvm"' >> ~/.zshrc
-        echo '[ -s "$(brew --prefix)/opt/nvm/nvm.sh" ] && \. "$(brew --prefix)/opt/nvm/nvm.sh"' >> ~/.zshrc
-        echo '[ -s "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm" ] && \. "$(brew --prefix)/opt/nvm/etc/bash_completion.d/nvm"' >> ~/.zshrc
+# 還原全域版本設定
+mkdir -p ~/.config/mise
+if [ -f "$SCRIPT_DIR/config/mise/config.toml" ]; then
+    if [ -f ~/.config/mise/config.toml ]; then
+        echo "⚠️  ~/.config/mise/config.toml 已存在，跳過覆寫"
+        echo "   repo 版本內容："
+        cat "$SCRIPT_DIR/config/mise/config.toml"
+    else
+        cp "$SCRIPT_DIR/config/mise/config.toml" ~/.config/mise/config.toml
+        echo "✅ 已還原 mise 全域設定"
     fi
-
-    # Load nvm for current session
-    export NVM_DIR="$HOME/.nvm"
-    [ -s "$(brew --prefix)/opt/nvm/nvm.sh" ] && \. "$(brew --prefix)/opt/nvm/nvm.sh"
-
-    echo "✅ nvm installed successfully"
 fi
 
 echo ""
-
-# Install latest LTS Node.js
-echo "📥 Installing Node.js LTS..."
-nvm install --lts
+echo "📥 安裝設定檔中的工具..."
+mise install
 
 echo ""
-
-# Set LTS as default
-echo "🔧 Setting LTS as default..."
-nvm alias default lts/*
-
+echo "✅ 完成"
+mise ls
 echo ""
-
-# Verify installation
-echo "✅ Node.js setup complete!"
-echo "Node version: $(node --version)"
-echo "npm version: $(npm --version)"
+echo "Node:  $(node --version 2>/dev/null || echo '需重開 shell')"
+echo "pnpm:  $(pnpm --version 2>/dev/null || echo '由 Brewfile 安裝')"
+echo ""
+echo "⚠️  確認 nvm 沒有被裝進來：brew list nvm 應該要失敗"

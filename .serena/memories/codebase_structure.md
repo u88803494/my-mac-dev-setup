@@ -10,8 +10,8 @@ mac-dev-setup/
 │   ├── node.sh                # 安裝 nvm + Node.js LTS
 │   ├── zsh.sh                 # 安裝 Zsh + OMZ + Powerlevel10k + 插件
 │   ├── symlink-zsh.sh         # 連結到 zsh-scripts repo
-│   ├── dev-tools.sh           # 安裝 git, gh, git-delta, eza, zoxide
-│   ├── apps.sh                # 安裝 GUI 應用（iTerm2, VS Code, Claude Code）
+│   ├── brew.sh                # Homebrew + brew bundle（取代 dev-tools.sh / apps.sh）
+│   ├── restore-dotfiles.sh    # 還原 .zshrc / .gitconfig / .p10k.zsh
 │   ├── iterm2-config.sh       # 配置 iTerm2 偏好設定同步
 │   └── cleanup.sh             # 清理腳本（用於測試）
 ├── git/
@@ -39,15 +39,15 @@ mac-dev-setup/
 2. `node.sh` - Node.js 環境
 3. `zsh.sh` - Shell 環境
 4. `symlink-zsh.sh` - 自訂 aliases/functions
-5. `dev-tools.sh` - 開發工具
-6. `apps.sh` - GUI 應用程式
+5. `restore-dotfiles.sh` - 還原 dotfiles
+6. `macos-defaults.sh` - 系統偏好設定
 7. `iterm2-config.sh` - iTerm2 同步設定
 
 ### 個別腳本執行
 `scripts/` 中的每個腳本都可以獨立執行：
 ```bash
 ./scripts/zsh.sh        # 只安裝 Zsh 環境
-./scripts/apps.sh       # 只安裝 GUI 應用
+./scripts/brew.sh       # Brewfile（CLI + GUI apps）
 ```
 
 ## 配置同步策略
@@ -69,19 +69,19 @@ mac-dev-setup/
 ## 組件間的相依性
 
 ### 強相依
-- `dev-tools.sh` 安裝 shell 配置依賴的工具：
+- `brew.sh` + Brewfile 安裝 shell 配置依賴的工具：
   - `eza` - `t()` 函式需要
   - `zoxide` - `j` alias 需要
   - `git-delta` - `.gitconfig` 中配置
 
 ### 弱相依
 - `symlink-zsh.sh` 需要 `zsh-scripts` repo 存在
-- `iterm2-config.sh` 需要 iTerm2 已安裝（來自 `apps.sh`）
+- `iterm2-config.sh` 需要 iTerm2 已安裝（來自 Brewfile）
 
 ## 外部相依
 
 ### 獨立的 Repository
 - `zsh-scripts` - 自訂 Zsh aliases 和 functions
-  - 位置：`~/personal/zsh-scripts`
+  - 位置：`~/Developer/Personal/zsh-scripts`
   - Repo：`https://github.com/u88803494/zsh-scripts.git`
   - 透過 symlink 連結到 `~/.oh-my-zsh/custom/plugins/`

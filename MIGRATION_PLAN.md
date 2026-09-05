@@ -27,28 +27,59 @@
 
 ### 1.1 把所有程式碼推上 GitHub
 
-未提交／未推送的變更（掃描時發現）：
+> 掃描結果（2026-09-05），共 19 個 git repo + 9 個非 repo 目錄
 
-- [ ] `Personal/curves_tool` — 有未提交變更，且**無 git remote**
-- [ ] `Personal/zsh-scripts` — `custom.plugin.zsh` 已修改未提交（這個最重要，是 shell 設定來源）
-- [ ] `Personal/job-hunting` — 有未追蹤檔案（`strategy/portfolio-decision-panel-20260904.md`）
-- [ ] `Personal/market-pulse` — `main.py`、`routers/stock_routes.py` 已修改
-- [ ] `Personal/my-dapp-guestbook` — `package.json` 已修改，且**無 remote**
-- [ ] `Personal/dictionary` — `.nvmrc` 未追蹤
+**A. 有 remote，但有未提交或未推送的東西**
 
-**無 GitHub remote 的目錄**（不推就會消失）：
-`curves_tool`、`movie-ticket-system`、`turbo-test`、`my-dapp-guestbook`、
-`interview hw`、`research`、`project-planning`、`references`、`Work/arisan`、`Work/wishmobile`、`Work/eucare`
+| Repo | 未提交 | 未推送 commit | 說明 |
+|---|---|---|---|
+| `Personal/my-website` | 0 | 30 | `main` 領先 1、`feat/velite-blog-phase-3` 領先 4；`feat/blog-redesign` 與 `feat/velite-blog-phase-2-backup` 是純本機分支 |
+| `Personal/flourish` | 0 | 13 | `backup-before-rebase` 分支從未推送；`main` 落後 30，需先 pull |
+| `Personal/market-pulse` | 6 | 5 | 改動與未推送 commit 都有 |
+| `Personal/henry-atlas` | 0 | 1 | |
+| `Personal/my-mac-dev-setup` | 0 | 2 | 本次的 `feat/new-mac-migration` 分支 |
+| `Personal/job-hunting` | 2 | 0 | `daemon.log`（可加 gitignore）、`strategy/portfolio-decision-panel-20260904.md` |
+| `Personal/zsh-scripts` | 1 | 0 | **`custom.plugin.zsh` — 最關鍵，新機 shell 靠它** |
+| `Personal/dictionary` | 1 | 0 | `.nvmrc` 未追蹤（新機用 mise，可考慮改 `.mise.toml`） |
 
-→ 決策：每個都要選 **(a) 建 private repo 推上去** 或 **(b) 打包丟 HPSSD** 或 **(c) 放棄**。
+**B. 完全沒有 git remote — 不處理就會消失**
+
+| 目錄 | 未提交 | 決策 |
+|---|---|---|
+| `Personal/curves_tool` | 5 | ☐ 建 private repo ☐ 打包存 HPSSD ☐ 放棄 |
+| `Personal/my-dapp-guestbook` | 2 | ☐ 建 private repo ☐ 打包存 HPSSD ☐ 放棄 |
+| `Personal/movie-ticket-system` | 0 | ☐ 建 private repo ☐ 打包存 HPSSD ☐ 放棄 |
+| `Personal/turbo-test` | 0 | ☐ 大概可以放棄（測試用） |
+
+**C. 根本不是 git repo 的目錄**
+
+| 目錄 | 大小 | 決策 |
+|---|---|---|
+| `Work/eucare` | 1.7G | ☐ 公司專案，確認是否該留在個人機器上 |
+| `Personal/interview hw` | 675M | ☐ 多半是 node_modules，清掉後再判斷 |
+| `Work/arisan` | 190M | ☐ |
+| `Personal/fastapi-quick-practice` | 63M | ☐ |
+| `Personal/references` | 976K | ☐ |
+| `Personal/research` | 416K | ☐ |
+| `Personal/project-planning` | 196K | ☐ |
+| `Personal/tradie-platform` | 4.0K | ☐ 空的，可刪 |
+| `Work/wishmobile` | 8.0K | ☐ 空的，可刪 |
+
+**D. 已確認乾淨（不用管）**
+`ai-dictionary`、`apex`、`b2b-user-management`、`flix-finder`、`flourish-flow`、
+`taipei-rental-finder`、`Work/buddhist`
+
+**重跑這份稽核：**
 
 ```bash
-# 快速檢查腳本（遷移前跑一次，確認全綠）
-find ~/Developer -maxdepth 3 -name .git -type d | while read g; do
+find ~/Developer -maxdepth 3 -name .git -type d | sort | while read g; do
   d=$(dirname "$g")
-  s=$(git -C "$d" status --porcelain | head -1)
-  u=$(git -C "$d" log --branches --not --remotes --oneline 2>/dev/null | head -1)
-  [ -n "$s$u" ] && echo "⚠️  $d"
+  r=$(git -C "$d" remote | head -1)
+  dirty=$(git -C "$d" status --porcelain | wc -l | tr -d ' ')
+  unpushed=$(git -C "$d" log --branches --not --remotes --oneline | wc -l | tr -d ' ')
+  [ -z "$r" ] && echo "❌ 無 remote: ${d#$HOME/Developer/}" && continue
+  [ "$dirty" != "0" ] || [ "$unpushed" != "0" ] && \
+    echo "⚠️  ${d#$HOME/Developer/}  未提交=$dirty 未推送=$unpushed"
 done
 ```
 

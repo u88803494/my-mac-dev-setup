@@ -1,0 +1,150 @@
+{
+  "terminal.external.osxExec": "iTerm.app",
+  "terminal.integrated.shell.osx": "/bin/zsh",
+  "liveServer.settings.donotVerifyTags": true,
+  "liveServer.settings.donotShowInfoMsg": true,
+  "files.associations": {
+    "*.js": "javascript",
+    "*.ts": "typescript"
+  },
+  "[javascript]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[scss]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true
+  },
+  "[json]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "vscode.json-language-features"
+  },
+  "[typescript]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "svg.preview.mode": "svg",
+  "[javascriptreact]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "explorer.confirmDragAndDrop": false,
+  "editor.formatOnSaveMode": "modifications",
+  "debug.javascript.autoAttachFilter": "always",
+  "turboConsoleLog.addSemicolonInTheEnd": true,
+  "turboConsoleLog.delimiterInsideMessage": ">",
+  "cSpell.userWords": [
+    "browserslist",
+    "postcss",
+    "reduxjs",
+    "tailwindcss",
+    "Unmount"
+  ],
+  "editor.formatOnType": true,
+  "todo-tree.tree.showScanModeButton": false,
+  "sync.gist": "3cea6bd5c909c92f7bccfa796f1bf95d",
+  "sync.autoUpload": true,
+  "files.autoSave": "off",
+  "files.autoSaveDelay": 10000,
+  "typescript.updateImportsOnFileMove.enabled": "always",
+  "debug.onTaskErrors": "debugAnyway",
+  "todo-tree.general.tags": [
+    "BUG",
+    "HACK",
+    "FIXME",
+    "TODO",
+    "XXX",
+    "[ ]",
+    "[x]"
+  ],
+  "todo-tree.regex.regex": "(//|#|<!--|;|/\\*|^|^\\s*(-|\\d+.))\\s*($TAGS)",
+  "terminal.integrated.tabs.enabled": true,
+  "terminal.integrated.defaultProfile.linux": "sh",
+  "terminal.integrated.profiles.linux": {
+    "bash": {
+      "path": "bash"
+    },
+    "zsh": {
+      "path": "zsh"
+    },
+    "fish": {
+      "path": "fish"
+    },
+    "tmux": {
+      "path": "tmux",
+      "icon": "terminal-tmux"
+    },
+    "pwsh": {
+      "path": "pwsh",
+      "icon": "terminal-powershell"
+    },
+    "sh": {
+      "path": "/bin/sh"
+    }
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "redhat.telemetry.enabled": true,
+  "[jsonc]": {
+    "editor.defaultFormatter": "rvest.vs-code-prettier-eslint"
+  },
+  "tailwindCSS.emmetCompletions": true,
+  "tailwindCSS.includeLanguages": {
+    "plaintext": "javascript",
+    "javascript": "javascript",
+    "html": "HTML"
+  },
+  "tailwindCSS.experimental.classRegex": [
+  
+  ],
+  "gitlens.advanced.messages": {
+    "suppressGitMissingWarning": true,
+    "suppressLineUncommittedWarning": true
+  },
+  "webhint.enableTelemetry": "enabled",
+  "git.ignoreMissingGitWarning": true,
+  "prettier.arrowParens": "avoid",
+  "editor.defaultFormatter": "rvest.vs-code-prettier-eslint",
+  "javascript.suggest.enabled": false,
+  "powermode.comboThreshold": 3,
+  "powermode.enabled": true,
+  "powermode.enableShake": false,
+"workbench.editor.wrapTabs": true,
+  "vscodeGoogleTranslate.preferredLanguage": "Chinese (Traditional)",
+  "EnglishChineseDictionary.enableHover": true,
+  "[shellscript]": {
+    "editor.defaultFormatter": "foxundermoon.shell-format"
+  },
+  "reactSnippets.settings.prettierEnabled": true,
+"reactSnippets.settings.typescriptComponentPropsStatePrefix": "interface",
+  "reactSnippets.settings.typescriptPropsStatePrefix": "interface",
+  "[svg]": {
+    "editor.defaultFormatter": "jock.svg"
+  },
+  "editor.tabSize": 2,
+  "autoimport.filesToScan": "**/*.{js,jsx,ts,tsx}",
+  "turboConsoleLog.quote": "`",
+  "bracketPairColorizer.depreciation-notice": false,
+  "vsicons.dontShowNewVersionMessage": true,
+  "react-i18n.sourceLocale": "zh-TW",
+"workbench.iconTheme": "vscode-icons",
+  "security.workspace.trust.untrustedFiles": "open",
+  "npm.keybindingsChangedWarningShown": true,
+  "editor.accessibilitySupport": "on",
+  "supermaven.otherWarning": false,
+  "security.allowedUNCHosts": [
+    "wsl.localhost"
+  ],
+  "git.autofetch": true,
+  "typescript.locale": "zh-TW",
+  "editor.guides.bracketPairs": "active",
+  "remote.SSH.remotePlatform": {
+    "sandbox.6l3xfj.csb": "linux"
+  },
+  "js/ts.experimental.useTsgo": true
+}

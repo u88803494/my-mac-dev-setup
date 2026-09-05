@@ -23,10 +23,10 @@
 
 ```bash
 # 1. Clone 此 repo
-git clone https://github.com/u88803494/my-mac-dev-setup.git ~/personal/mac-dev-setup
+git clone https://github.com/u88803494/my-mac-dev-setup.git ~/Developer/Personal/my-mac-dev-setup
 
 # 2. 執行完整安裝（會自動執行 iterm2-config.sh）
-cd ~/personal/mac-dev-setup
+cd ~/Developer/Personal/my-mac-dev-setup
 ./setup.sh
 
 # 3. 重啟 iTerm2
@@ -39,7 +39,7 @@ cd ~/personal/mac-dev-setup
 1. 打開 **Preferences** (⌘,)
 2. 進入 **General** → **Preferences**
 3. 勾選 **Load preferences from a custom folder or URL**
-4. 選擇此目錄：`~/personal/mac-dev-setup/config/iterm2`
+4. 選擇此目錄：`~/Developer/Personal/my-mac-dev-setup/config/iterm2`
 
 ## 📁 配置文件
 

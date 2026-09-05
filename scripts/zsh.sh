@@ -2,35 +2,55 @@
 
 # Zsh + Oh My Zsh + Powerlevel10k Installation Script
 # ======================================================
+#
+# 這支腳本只負責「裝軟體」（OMZ、p10k 主題、plugin repo）。
+# 不會修改 ~/.zshrc 內容——那是 restore-dotfiles.sh 的職責
+# （直接還原 config/shell/.zshrc 整份檔案）。兩邊都去改 .zshrc
+# 會互相覆蓋、順序打架，所以職責切開。
 
 set -e  # Exit on error
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
+ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 echo "🐚 Installing Zsh + Oh My Zsh + Powerlevel10k"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-# Check if Zsh is installed
-if command -v zsh &> /dev/null; then
-    echo "✅ Zsh already installed"
-    zsh --version
-else
-    echo "📥 Installing Zsh..."
-    brew install zsh
-    echo "✅ Zsh installed successfully"
-fi
+# ─────────────────────────────────────────────
+# Zsh：一律使用系統內建 /bin/zsh
+# ─────────────────────────────────────────────
+# 不透過 Homebrew 裝 zsh — 現代 macOS 內建的 /bin/zsh 已經是預設 shell、
+# 已在 /etc/shells 內。改裝一份 Homebrew zsh 只會讓 chsh 的目標路徑
+# 變成不在 /etc/shells 裡的 /opt/homebrew/bin/zsh，反而製造問題。
+ZSH_BIN="$(command -v zsh)"
+echo "使用 zsh：$ZSH_BIN"
+zsh --version
 
-# Set Zsh as default shell
-if [ "$SHELL" != "$(which zsh)" ]; then
-    echo "🔧 Setting Zsh as default shell..."
-    chsh -s $(which zsh)
-    echo "✅ Zsh set as default shell (restart terminal to apply)"
+# 設為預設 shell（若還不是）
+if [ "$SHELL" != "$ZSH_BIN" ]; then
+    if ! grep -qxF "$ZSH_BIN" /etc/shells; then
+        echo "⚠️  $ZSH_BIN 不在 /etc/shells 內，需要 sudo 權限加入"
+        echo "    這一步需要輸入密碼，且不能在背景/非互動環境執行："
+        echo "    sudo sh -c 'echo \"$ZSH_BIN\" >> /etc/shells'"
+        echo "⏭  略過自動加入，請使用者本人手動執行上面那行後再跑一次 chsh"
+    else
+        echo "🔧 設定 zsh 為預設 shell..."
+        echo "    ⚠️  chsh 會要求輸入『目前登入使用者』的密碼——這一步"
+        echo "    必須由使用者本人在有 TTY 的終端機裡手動完成，AI 不要"
+        echo "    嘗試在背景執行，否則會卡住等輸入或直接失敗。"
+        chsh -s "$ZSH_BIN"
+        echo "✅ Zsh 已設為預設 shell（重啟終端機生效）"
+    fi
 else
-    echo "✅ Zsh is already the default shell"
+    echo "✅ zsh 已經是預設 shell"
 fi
 
 echo ""
 
-# Install Oh My Zsh
+# ─────────────────────────────────────────────
+# Oh My Zsh
+# ─────────────────────────────────────────────
 if [ -d "$HOME/.oh-my-zsh" ]; then
     echo "✅ Oh My Zsh already installed"
 else
@@ -41,15 +61,11 @@ fi
 
 echo ""
 
-# Install MesloLGS Nerd Font (Powerlevel10k recommended font)
-echo "📥 Installing MesloLGS Nerd Font..."
-brew tap homebrew/cask-fonts
-brew install --cask font-meslo-lg-nerd-font 2>/dev/null || echo "✅ MesloLGS Nerd Font already installed"
-
-echo ""
-
-# Install Powerlevel10k
-P10K_DIR="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
+# ─────────────────────────────────────────────
+# Powerlevel10k 主題
+# ─────────────────────────────────────────────
+# 字型（font-meslo-lg-nerd-font）由 Brewfile 統一安裝，這裡不重複裝。
+P10K_DIR="$ZSH_CUSTOM/themes/powerlevel10k"
 if [ -d "$P10K_DIR" ]; then
     echo "✅ Powerlevel10k already installed"
 else
@@ -60,100 +76,40 @@ fi
 
 echo ""
 
-# Install OMZ plugins
-echo "📥 Installing Oh My Zsh plugins..."
-ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
+# ─────────────────────────────────────────────
+# Zsh plugins（git clone 進 $ZSH_CUSTOM/plugins/）
+# ─────────────────────────────────────────────
+# 舊機實測這兩個 plugin 是 git clone 進 custom/plugins，不是透過
+# Homebrew 安裝——OMZ 的 plugins=() 陣列只會在 $ZSH/plugins 與
+# $ZSH_CUSTOM/plugins 底下找同名目錄，不會自動抓 brew 的 share 路徑。
+clone_plugin() {
+    local name="$1" url="$2"
+    if [ -d "$ZSH_CUSTOM/plugins/$name" ]; then
+        echo "✅ $name already installed"
+    else
+        echo "📥 Installing $name..."
+        git clone --depth=1 "$url" "$ZSH_CUSTOM/plugins/$name"
+    fi
+}
 
-# Install zsh-completions
-if [ -d "$ZSH_CUSTOM/plugins/zsh-completions" ]; then
-    echo "✅ zsh-completions already installed"
-else
-    git clone https://github.com/zsh-users/zsh-completions "$ZSH_CUSTOM/plugins/zsh-completions"
-    echo "✅ zsh-completions installed"
-fi
-
-# Install zsh-pnpm-completions
-if [ -d "$ZSH_CUSTOM/plugins/zsh-pnpm-completions" ]; then
-    echo "✅ zsh-pnpm-completions already installed"
-else
-    git clone https://github.com/g-plane/zsh-pnpm-shell-completion.git "$ZSH_CUSTOM/plugins/zsh-pnpm-completions"
-    echo "✅ zsh-pnpm-completions installed"
-fi
-
-echo ""
-
-# Install Zsh plugins via Homebrew
-echo "📥 Installing Zsh plugins via Homebrew..."
-brew install zsh-autosuggestions zsh-syntax-highlighting 2>/dev/null || echo "✅ Homebrew Zsh plugins already installed"
+clone_plugin "zsh-autosuggestions" "https://github.com/zsh-users/zsh-autosuggestions"
+clone_plugin "zsh-syntax-highlighting" "https://github.com/zsh-users/zsh-syntax-highlighting.git"
 
 echo ""
 
-# Copy p10k configuration if exists
+# ─────────────────────────────────────────────
+# p10k 設定檔（restore-dotfiles.sh 通常已處理，這裡只是防呆）
+# ─────────────────────────────────────────────
 if [ -f "$HOME/.p10k.zsh" ]; then
-    echo "✅ .p10k.zsh configuration already exists"
-else
-    SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-    if [ -f "$SCRIPT_DIR/config/.p10k.zsh" ]; then
-        echo "📋 Copying p10k configuration..."
-        cp "$SCRIPT_DIR/config/.p10k.zsh" "$HOME/.p10k.zsh"
-        echo "✅ p10k configuration copied"
-    else
-        echo "⚠️  p10k configuration not found in repo. Run 'p10k configure' manually later."
-    fi
+    echo "✅ .p10k.zsh 已存在"
+elif [ -f "$SCRIPT_DIR/config/.p10k.zsh" ]; then
+    cp "$SCRIPT_DIR/config/.p10k.zsh" "$HOME/.p10k.zsh"
+    echo "✅ 已複製 .p10k.zsh"
 fi
 
 echo ""
-
-# Update .zshrc to use Powerlevel10k theme
-if grep -q "ZSH_THEME=\"powerlevel10k/powerlevel10k\"" ~/.zshrc 2>/dev/null; then
-    echo "✅ .zshrc already configured for Powerlevel10k"
-else
-    echo "🔧 Updating .zshrc theme to Powerlevel10k..."
-    sed -i.bak 's/^ZSH_THEME=.*/ZSH_THEME="powerlevel10k\/powerlevel10k"/' ~/.zshrc
-    echo "✅ .zshrc updated"
-fi
-
+echo "✅ Zsh 環境安裝完成"
 echo ""
-
-# Update plugins in .zshrc
-if grep -q "plugins=(git zsh-completions zsh-pnpm-completions)" ~/.zshrc 2>/dev/null; then
-    echo "✅ .zshrc plugins already configured"
-else
-    echo "🔧 Updating .zshrc plugins..."
-    sed -i.bak 's/^plugins=.*/plugins=(git zsh-completions zsh-pnpm-completions)/' ~/.zshrc
-    echo "✅ .zshrc plugins updated"
-fi
-
-echo ""
-
-# Add Homebrew plugin sources to .zshrc (before sourcing oh-my-zsh.sh)
-if grep -q "zsh-autosuggestions.zsh" ~/.zshrc 2>/dev/null; then
-    echo "✅ Homebrew plugins already sourced in .zshrc"
-else
-    echo "🔧 Adding Homebrew plugin sources to .zshrc..."
-
-    # Find the line number where oh-my-zsh.sh is sourced
-    if grep -n "source.*oh-my-zsh.sh" ~/.zshrc &> /dev/null; then
-        # Insert before oh-my-zsh.sh source line
-        sed -i.bak '/source.*oh-my-zsh.sh/i\
-# Homebrew-managed plugins\
-source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh\
-source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh\
-' ~/.zshrc
-    else
-        # Append to end if oh-my-zsh.sh source not found
-        echo "" >> ~/.zshrc
-        echo "# Homebrew-managed plugins" >> ~/.zshrc
-        echo 'source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh' >> ~/.zshrc
-        echo 'source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh' >> ~/.zshrc
-    fi
-
-    echo "✅ Homebrew plugin sources added"
-fi
-
-echo ""
-echo "✅ Zsh setup complete!"
-echo ""
-echo "📝 Next steps:"
-echo "   1. Restart your terminal or run: source ~/.zshrc"
-echo "   2. All plugins and configurations are ready to use"
+echo "📝 .zshrc 內容（ZSH_THEME / plugins=(...) 等）由"
+echo "   scripts/restore-dotfiles.sh 還原，不在這支腳本處理。"
+echo "   重啟終端機或 source ~/.zshrc 生效。"

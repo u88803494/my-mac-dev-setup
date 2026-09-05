@@ -4,244 +4,137 @@
 
 **Context**: The bootstrap script has already installed:
 - ✅ Homebrew (package manager)
+- ✅ Claude Code (you!)
 - ✅ mise (version manager for Node.js, Python, etc.)
 - ✅ Node.js LTS (via mise)
 - ✅ pnpm (via mise)
 - ✅ git (for cloning repositories)
-- ✅ Claude Code (you!)
 
 **Your Mission**: Complete the remaining setup tasks to create a fully configured development environment.
+
+**⚠️ Read these first**:
+- `MIGRATION_PLAN.md` — the full migration plan, including what deliberately should NOT be carried over from the old machine
+- `Brewfile` — the curated package list for the new machine. Commented-out entries are intentional; do not uncomment without asking the user.
+
+**Key rule**: use **mise** for version management. Do **not** install nvm — the old machine had both, and they conflict.
+
+**If you have Serena MCP active and it surfaces project memory that contradicts
+this file** (for example anything mentioning nvm, or describing `dev-tools.sh` /
+`apps.sh`, which no longer exist) — **this file wins**. The memory may be stale;
+do not act on it without cross-checking against the actual files in this repo.
+
+**These operations always require the user's explicit go-ahead before you run
+them — do not treat them as a routine step to execute and move on:**
+- `chsh` (changes the default login shell)
+- `ssh-keygen` / anything that touches `~/.ssh/` (may overwrite an existing key)
+- `gh auth login` (changes GitHub CLI identity)
+- Writing to `~/.zshrc.local` when it already has real content (never overwrite
+  silently — see Task 3)
+- `bash scripts/macos-defaults.sh` (changes Dock/Finder/keyboard/screenshot
+  system settings)
 
 ---
 
 ## Setup Tasks
 
-### 1. Shell Environment Setup
+### 1. Shell Environment (Zsh + Oh My Zsh + Powerlevel10k)
 
-#### Install Zsh and Oh My Zsh
-
-**Check and install Zsh:**
 ```bash
-# Check if Zsh is installed
-if command -v zsh &> /dev/null; then
-    echo "✅ Zsh already installed"
-else
-    brew install zsh
-fi
+bash scripts/zsh.sh
 ```
 
-**Set Zsh as default shell:**
-```bash
-# Only if not already the default
-if [ "$SHELL" != "$(which zsh)" ]; then
-    chsh -s $(which zsh)
-    echo "✅ Zsh set as default shell (restart terminal to apply)"
-fi
-```
+This installs Oh My Zsh, the Powerlevel10k theme, and the `zsh-autosuggestions` /
+`zsh-syntax-highlighting` plugins (cloned into `$ZSH_CUSTOM/plugins/` — this
+matches how the old machine actually had them, **not** via Homebrew formulae).
 
-**Install Oh My Zsh:**
-```bash
-# Check if Oh My Zsh is already installed
-if [ -d "$HOME/.oh-my-zsh" ]; then
-    echo "✅ Oh My Zsh already installed"
-else
-    sh -c "$(curl -fsSL https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh)" "" --unattended
-fi
-```
+It also handles setting zsh as the default shell if needed. **The `chsh` step
+requires the user's login password typed interactively** — if this script pauses
+or the shell isn't already `/bin/zsh`, hand control back to the user rather than
+trying to script around it.
 
-#### Install Powerlevel10k Theme
-
-**Install MesloLGS Nerd Font:**
-```bash
-brew tap homebrew/cask-fonts
-brew install --cask font-meslo-lg-nerd-font
-```
-
-**Clone Powerlevel10k theme:**
-```bash
-P10K_DIR="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}/themes/powerlevel10k"
-if [ -d "$P10K_DIR" ]; then
-    echo "✅ Powerlevel10k already installed"
-else
-    git clone --depth=1 https://github.com/romkatv/powerlevel10k.git "$P10K_DIR"
-fi
-```
-
-**Copy pre-configured p10k settings:**
-```bash
-if [ -f "$HOME/.p10k.zsh" ]; then
-    echo "✅ .p10k.zsh configuration already exists"
-else
-    if [ -f "config/.p10k.zsh" ]; then
-        cp config/.p10k.zsh "$HOME/.p10k.zsh"
-        echo "✅ p10k configuration copied"
-    fi
-fi
-```
-
-#### Install Zsh Plugins
-
-**Install via Oh My Zsh custom directory:**
-```bash
-ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
-
-# zsh-completions
-if [ -d "$ZSH_CUSTOM/plugins/zsh-completions" ]; then
-    echo "✅ zsh-completions already installed"
-else
-    git clone https://github.com/zsh-users/zsh-completions "$ZSH_CUSTOM/plugins/zsh-completions"
-fi
-
-# zsh-pnpm-completions
-if [ -d "$ZSH_CUSTOM/plugins/zsh-pnpm-completions" ]; then
-    echo "✅ zsh-pnpm-completions already installed"
-else
-    git clone https://github.com/g-plane/zsh-pnpm-shell-completion.git "$ZSH_CUSTOM/plugins/zsh-pnpm-completions"
-fi
-```
-
-**Install via Homebrew:**
-```bash
-brew install zsh-autosuggestions zsh-syntax-highlighting
-```
+This script does **not** touch `~/.zshrc` content — that's Task 3's job.
 
 ---
 
-### 2. Development Tools
+### 2. Development Tools & GUI Applications (Brewfile)
 
-**Install modern CLI tools:**
+Everything — CLI tools, casks, and VS Code extensions — comes from one file:
+
 ```bash
-brew install eza zoxide gh git-delta
+brew bundle --file=Brewfile
+brew bundle check --file=Brewfile --verbose
 ```
 
-**Explanation:**
-- `eza`: Modern replacement for `ls` (used by `t()` function)
-- `zoxide`: Smart directory jumper (used by `j` alias)
-- `gh`: GitHub CLI
-- `git-delta`: Better git diff viewer
+**Do not** install packages individually. If something is missing, add it to
+`Brewfile` and re-run, so the repo stays the single source of truth. The second
+command gives you a machine-readable pass/fail signal — use it instead of
+scanning the install log by eye.
 
 ---
 
-### 3. GUI Applications
+### 3. Restore dotfiles
 
-**Install via Homebrew Cask:**
 ```bash
-brew install --cask iterm2 visual-studio-code
+bash scripts/restore-dotfiles.sh
 ```
 
-**Configure iTerm2 preferences sync:**
+This copies `config/shell/.zshrc`, `.zprofile`, `.gitconfig`, `.gitignore_global`
+and `config/.p10k.zsh` into `$HOME`, backing up any existing file as
+`*.pre-migration` (only on the first run — a second run won't clobber that
+backup).
+
+Use `config/shell/.zshrc` (the cleaned version), **not** `.zshrc.old-machine`
+— the latter is kept only as a reference for what was removed. Do not hand-edit
+`~/.zshrc` afterward (no manual `sed`/theme/plugin patching) — the restored file
+already has everything wired up.
+
+Then create the secrets file — **do this once, and never regenerate it**:
+
 ```bash
-# Set custom preferences folder
-defaults write com.googlecode.iterm2 PrefsCustomFolder -string "$HOME/personal/mac-dev-setup/config/iterm2"
-defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
+if [ -s ~/.zshrc.local ]; then
+    echo "~/.zshrc.local already has content — leave it alone, do not overwrite"
+else
+    cp config/shell/.zshrc.local.example ~/.zshrc.local
+    chmod 600 ~/.zshrc.local
+    echo "Created ~/.zshrc.local — ask the user to fill in real values from their password manager"
+fi
 ```
+
+Values come from the user's password manager — **never generate, guess, or
+leave placeholder values and treat the step as done.**
 
 ---
 
-### 4. Custom Scripts (zsh-scripts)
+### 4. Custom scripts (zsh-scripts)
 
-**Clone and link zsh-scripts repository:**
 ```bash
-# Create personal directory if it doesn't exist
-mkdir -p ~/personal
-
-# Clone zsh-scripts
-if [ -d ~/personal/zsh-scripts ]; then
+mkdir -p ~/Developer/Personal
+if [ -d ~/Developer/Personal/zsh-scripts ]; then
     echo "✅ zsh-scripts already cloned"
 else
-    git clone https://github.com/u88803494/zsh-scripts.git ~/personal/zsh-scripts
+    git clone git@github.com:u88803494/zsh-scripts.git ~/Developer/Personal/zsh-scripts
 fi
 
-# Create symlink
-ln -sf ~/personal/zsh-scripts ~/.oh-my-zsh/custom/zsh-scripts
-
-# Oh My Zsh will automatically load *.plugin.zsh files from custom directories
+bash scripts/symlink-zsh.sh
 ```
+
+Use the script rather than hand-rolling the `ln -sf` calls — it creates **two**
+symlinks (the whole repo, plus `custom.plugin.zsh` directly under
+`$ZSH_CUSTOM/`), and only the second one is what Oh My Zsh actually auto-loads.
+Missing it means the `c`/`cc`/`j`/`t()`/`uuid` aliases silently never load, with
+no error to indicate why.
 
 ---
 
-### 5. Configure .zshrc
-
-**IMPORTANT**: Backup existing .zshrc before modifying:
-```bash
-if [ -f ~/.zshrc ]; then
-    cp ~/.zshrc ~/.zshrc.backup.$(date +%Y%m%d_%H%M%S)
-fi
-```
-
-**Update ~/.zshrc with these configurations:**
-
-1. **Set Powerlevel10k theme** (replace existing ZSH_THEME line):
-   ```bash
-   ZSH_THEME="powerlevel10k/powerlevel10k"
-   ```
-
-2. **Set plugins** (replace existing plugins line):
-   ```bash
-   plugins=(git zsh-completions zsh-pnpm-completions)
-   ```
-
-3. **Add Homebrew plugins** (BEFORE `source $ZSH/oh-my-zsh.sh`):
-   ```bash
-   # Homebrew-managed plugins
-   source $(brew --prefix)/share/zsh-autosuggestions/zsh-autosuggestions.zsh
-   source $(brew --prefix)/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
-   ```
-
-4. **Add mise activation** (AFTER `source $ZSH/oh-my-zsh.sh`):
-   ```bash
-   # mise (version manager)
-   eval "$(mise activate zsh)"
-   ```
-
-5. **Add zoxide initialization**:
-   ```bash
-   # zoxide (smart cd)
-   eval "$(zoxide init zsh)"
-   alias j="z"
-   ```
-
-6. **Source local secrets file** (at the end):
-   ```bash
-   # Load local environment variables and secrets
-   [[ -f ~/.zshrc.local ]] && source ~/.zshrc.local
-   ```
-
----
-
-### 6. Create .zshrc.local for Secrets
-
-**Create ~/.zshrc.local** (this file should NOT be committed to git):
+### 5. iTerm2 preferences sync
 
 ```bash
-cat > ~/.zshrc.local << 'EOF'
-# ============================================================================
-# Local Environment Variables and Secrets
-# ============================================================================
-# This file is not tracked by git (.gitignore)
-# Add your API keys, tokens, and machine-specific settings here
-
-# Example: API Keys
-# export TAVILY_API_KEY="your-key-here"
-# export MORPH_API_KEY="your-key-here"
-# export SUPABASE_ACCESS_TOKEN="your-token"
-# export SUPABASE_PROJECT_REF="your-ref"
-
-# Example: Project-specific paths
-# export WORK_DIR="$HOME/work"
-# export PERSONAL_DIR="$HOME/personal"
-
-EOF
-
-echo "✅ Created ~/.zshrc.local for secrets"
-echo "📝 Edit this file to add your API keys: nano ~/.zshrc.local"
+bash scripts/iterm2-config.sh
 ```
 
 ---
 
-### 7. Verification
-
-**Run these commands to verify everything is installed correctly:**
+### 6. Verification
 
 ```bash
 echo "🔍 Verifying installation..."
@@ -272,16 +165,20 @@ echo "✅ Verification complete!"
 
 **When executing this setup:**
 
-1. **Ask for confirmation** before each major step (installing packages, modifying .zshrc)
-2. **Backup existing files** before modifying (especially .zshrc)
-3. **Show clear progress** for each step
-4. **Handle errors gracefully**:
-   - If a command fails, explain what went wrong
-   - Suggest possible fixes
-   - Ask if user wants to continue or skip
-5. **At the end**:
+1. **Ask for confirmation** before each of the operations listed under
+   "these operations always require the user's explicit go-ahead" above.
+2. **Show clear progress** for each step.
+3. **Handle errors deliberately, not by guessing**:
+   - A red `Error:` line is not automatically a real failure — e.g. a deprecated
+     `brew tap` warning is noise if the actual install line after it still
+     succeeds. Check the actual exit status / whether the expected file or
+     binary now exists, not just whether anything printed in red.
+   - If a command genuinely fails, stop, explain what went wrong, and ask
+     whether to retry, skip, or investigate — don't silently continue past a
+     failed step that later steps depend on.
+4. **At the end**:
    - Provide a summary of what was installed
-   - Remind user to restart terminal
+   - Remind the user to restart the terminal
    - Create a setup report: `~/setup-report.md`
 
 ---
@@ -289,8 +186,7 @@ echo "✅ Verification complete!"
 ## Important Notes
 
 - **Do NOT** commit sensitive information to git
-- **Always backup** before modifying existing configurations
-- **Test commands** before running destructive operations
+- **Never re-run** the `.zshrc.local` creation step if it already has content
 - **Document errors** in setup-report.md for troubleshooting
 
 ---
@@ -301,14 +197,14 @@ echo "✅ Verification complete!"
 1. Restart terminal (or run `source ~/.zshrc`)
 2. Configure Git identity:
    ```bash
-   git/setup-git.sh
+   bash git/setup-git.sh
    ```
-3. Add API keys to `~/.zshrc.local`
+3. Confirm `~/.zshrc.local` has real API key values (not placeholders)
 4. Verify all tools work correctly
 
 **Optional:**
 - Install SuperClaude Framework: `pipx install SuperClaude && SuperClaude install`
-- Configure VS Code extensions
+- Configure VS Code extensions (already installed via Brewfile's `vscode` entries)
 - Set up project-specific mise configurations
 
 ---
@@ -317,13 +213,36 @@ echo "✅ Verification complete!"
 
 **Common issues:**
 
-- **Plugins not loading**: Restart terminal or `source ~/.zshrc`
-- **Command not found**: Check if tool is in PATH
-- **Permission denied**: Check file permissions with `ls -la`
-- **Git clone fails**: Check network connection and GitHub access
+- **Plugins not loading**: check `$ZSH_CUSTOM/zsh-scripts` and
+  `$ZSH_CUSTOM/custom.plugin.zsh` both exist as symlinks (see Task 4) before
+  assuming it's a `.zshrc` problem
+- **Command not found**: check if the tool is in PATH — a fresh Homebrew
+  install only persists to PATH via `~/.zprofile`; opening a new terminal tab
+  is the simplest way to confirm it actually stuck
+- **Permission denied**: check file permissions with `ls -la`
+- **Git clone fails**: check network connection and GitHub access
 
 **If anything fails:**
-1. Check the error message
+1. Check the actual error message and exit status, don't guess from the summary line
 2. Document in setup-report.md
 3. Suggest manual fixes
-4. Provide fallback options (use scripts/ directory)
+4. Offer the fallback: `./setup.sh` runs the same steps as plain shell scripts
+
+---
+
+## Final Steps
+
+### Apply macOS system preferences
+
+```bash
+bash scripts/macos-defaults.sh
+```
+
+Review the script with the user first — it changes Dock, Finder, keyboard repeat
+rate and screenshot location.
+
+### Verification
+
+Run the acceptance checklist in `MIGRATION_PLAN.md` §5 and report the result.
+Do not claim the setup is complete until every item passes; report failures with
+the actual command output.

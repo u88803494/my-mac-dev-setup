@@ -1,87 +1,95 @@
 # 程式碼結構
 
+> 最後校對：2026-09-05
+
 ## 目錄配置
 
 ```
-mac-dev-setup/
-├── setup.sh                    # 主要安裝編排器
+my-mac-dev-setup/
+├── MIGRATION_PLAN.md            # 換機主計劃書（遷移前必讀）
+├── SETUP_PROMPT.md              # AI 執行入口（主要路徑）
+├── bootstrap.sh                 # 最小化安裝：Homebrew → Claude Code → mise/Node → git
+├── setup.sh                     # 傳統手動路徑（備援，依序呼叫 scripts/*.sh）
+├── Brewfile                     # 新機套件目標清單（唯一事實來源）
+├── Brewfile.old-machine         # 舊機快照，僅供參考，不要拿來安裝
 ├── scripts/
-│   ├── brew.sh                # 安裝 Homebrew + pnpm
-│   ├── node.sh                # 安裝 nvm + Node.js LTS
-│   ├── zsh.sh                 # 安裝 Zsh + OMZ + Powerlevel10k + 插件
-│   ├── symlink-zsh.sh         # 連結到 zsh-scripts repo
-│   ├── dev-tools.sh           # 安裝 git, gh, git-delta, eza, zoxide
-│   ├── apps.sh                # 安裝 GUI 應用（iTerm2, VS Code, Claude Code）
-│   ├── iterm2-config.sh       # 配置 iTerm2 偏好設定同步
-│   └── cleanup.sh             # 清理腳本（用於測試）
+│   ├── brew.sh                 # Homebrew 安裝 + brew bundle
+│   ├── node.sh                 # mise 全域設定還原 + mise install（不是 nvm）
+│   ├── zsh.sh                  # OMZ + p10k 主題 + zsh-autosuggestions/
+│   │                           #   zsh-syntax-highlighting（git clone 進
+│   │                           #   custom/plugins，不是 brew formula）
+│   │                           #   不修改 .zshrc 內容
+│   ├── restore-dotfiles.sh     # 還原 .zshrc/.zprofile/.gitconfig/.p10k.zsh
+│   ├── symlink-zsh.sh          # clone + symlink zsh-scripts repo
+│   ├── iterm2-config.sh        # iTerm2 偏好設定同步
+│   ├── macos-defaults.sh       # Dock/Finder/鍵盤/截圖 系統偏好設定
+│   └── cleanup.sh              # 清理腳本（測試用）
 ├── git/
-│   ├── setup-git.sh           # 互動式 Git 配置管理器
-│   ├── .gitconfig.personal    # 個人 Git 配置範本
-│   └── .gitconfig.work        # 工作 Git 配置範本
+│   ├── setup-git.sh            # 互動式 Git 配置管理器
+│   ├── .gitconfig.personal
+│   └── .gitconfig.work
 ├── config/
-│   ├── .p10k.zsh             # Powerlevel10k 預先配置的主題
-│   ├── iterm2/               # iTerm2 配置同步
-│   │   ├── README.md
-│   │   └── com.googlecode.iterm2.plist
-│   └── claude/               # SuperClaude 個人設定備份
-│       ├── README.md
-│       └── settings.json
-├── .serena/                   # Serena MCP 專案配置（此目錄）
-├── README.md                  # 完整文檔
+│   ├── .p10k.zsh                # Powerlevel10k 預先配置
+│   ├── shell/
+│   │   ├── .zshrc               # 新機乾淨版（單一事實來源）
+│   │   ├── .zshrc.old-machine   # 舊機原樣，僅供對照
+│   │   ├── .zshrc.local.example # 秘密範本（只有 key 名稱）
+│   │   ├── .zprofile
+│   │   ├── .gitconfig
+│   │   └── .gitignore_global
+│   ├── vscode/
+│   │   ├── settings.json
+│   │   ├── extensions.txt
+│   │   └── snippets/
+│   ├── mise/config.toml         # 全域版本設定（node/uv）
+│   ├── iterm2/com.googlecode.iterm2.plist
+│   └── claude/settings.json     # SuperClaude 個人設定備份
 └── .gitignore
 ```
 
 ## 腳本執行流程
 
-### 主要安裝（`./setup.sh`）
-依序執行腳本：
-1. `brew.sh` - 套件管理器基礎
-2. `node.sh` - Node.js 環境
-3. `zsh.sh` - Shell 環境
-4. `symlink-zsh.sh` - 自訂 aliases/functions
-5. `dev-tools.sh` - 開發工具
-6. `apps.sh` - GUI 應用程式
-7. `iterm2-config.sh` - iTerm2 同步設定
+### AI 路徑（`SETUP_PROMPT.md`，主線）
+1. `bash scripts/zsh.sh` — Zsh/OMZ/p10k/plugins
+2. `brew bundle --file=Brewfile` + `brew bundle check`
+3. `bash scripts/restore-dotfiles.sh` + 建立 `~/.zshrc.local`
+4. clone zsh-scripts + `bash scripts/symlink-zsh.sh`
+5. `bash scripts/iterm2-config.sh`
+6. 驗證
+7. `bash scripts/macos-defaults.sh`（需先跟使用者確認）
+
+### 傳統路徑（`./setup.sh`，備援）
+`brew.sh` → `node.sh` → `zsh.sh` → `restore-dotfiles.sh` → `symlink-zsh.sh`
+→ `iterm2-config.sh` → `macos-defaults.sh`
 
 ### 個別腳本執行
-`scripts/` 中的每個腳本都可以獨立執行：
 ```bash
-./scripts/zsh.sh        # 只安裝 Zsh 環境
-./scripts/apps.sh       # 只安裝 GUI 應用
+./scripts/zsh.sh              # 只裝 Zsh 環境
+./scripts/brew.sh             # Brewfile（CLI + GUI apps）
 ```
+
+## 職責邊界（避免兩邊各自維護一份邏輯）
+
+- **`.zshrc` 的內容**（ZSH_THEME/plugins=()/mise 初始化等）只由
+  `config/shell/.zshrc` + `restore-dotfiles.sh` 決定。`zsh.sh` 只負責把
+  OMZ/主題/plugin 的軟體本身裝好，不修改 `.zshrc` 內容——避免兩邊互改。
+- **套件清單**只由 `Brewfile` 決定。任何腳本都不應該有獨立的
+  `brew install <個別套件>`。
+- **mise 全域版本設定**只由 `config/mise/config.toml` 決定，`node.sh`
+  負責把它複製到 `~/.config/mise/config.toml`（一律覆寫，只在第一次備份）。
 
 ## 配置同步策略
 
 ### iTerm2
-- 使用 macOS `defaults write` 設定自訂偏好設定資料夾
-- 自動同步到 `config/iterm2/com.googlecode.iterm2.plist`
-- 雙向同步 - iTerm2 中的變更會自動儲存到 repo
+- `defaults write` 指向 `config/iterm2/`，雙向同步
 
-### SuperClaude
-- **框架組件**：透過 `SuperClaude install` 管理（不在 repo 中）
-- **個人設定**：`config/claude/settings.json`（在 repo 中備份）
-- 手動恢復：`cp config/claude/settings.json ~/.claude/settings.json`
-
-### Zsh 配置
-- 連結到獨立的 `zsh-scripts` repo（不包含在此處）
-- 自訂 aliases 和 functions 在該 repo 中
-
-## 組件間的相依性
-
-### 強相依
-- `dev-tools.sh` 安裝 shell 配置依賴的工具：
-  - `eza` - `t()` 函式需要
-  - `zoxide` - `j` alias 需要
-  - `git-delta` - `.gitconfig` 中配置
-
-### 弱相依
-- `symlink-zsh.sh` 需要 `zsh-scripts` repo 存在
-- `iterm2-config.sh` 需要 iTerm2 已安裝（來自 `apps.sh`）
+### zsh-scripts（獨立 repo）
+- 位置：`~/Developer/Personal/zsh-scripts`
+- Repo：`git@github.com:u88803494/zsh-scripts.git`
+- `symlink-zsh.sh` 建立**兩個** symlink：整包 repo + `custom.plugin.zsh`
+  直接連到 `$ZSH_CUSTOM/` 根目錄（OMZ 只自動載入根目錄下的 `*.plugin.zsh`，
+  漏掉第二個 symlink 會讓自訂 alias 完全不生效且沒有錯誤訊息）
 
 ## 外部相依
 
-### 獨立的 Repository
-- `zsh-scripts` - 自訂 Zsh aliases 和 functions
-  - 位置：`~/personal/zsh-scripts`
-  - Repo：`https://github.com/u88803494/zsh-scripts.git`
-  - 透過 symlink 連結到 `~/.oh-my-zsh/custom/plugins/`
+- `zsh-scripts` — 自訂 aliases/functions，獨立 repo，AI 執行時需要先 clone

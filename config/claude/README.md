@@ -55,20 +55,20 @@ SuperClaude install
 ### 恢復個人設定
 ```bash
 # 手動恢復個人設定
-cp ~/personal/mac-dev-setup/config/claude/settings.json ~/.claude/settings.json
+cp ~/Developer/Personal/my-mac-dev-setup/config/claude/settings.json ~/.claude/settings.json
 ```
 
 ### 備份當前設定
 ```bash
 # 將當前設定備份到 repo
-cp ~/.claude/settings.json ~/personal/mac-dev-setup/config/claude/
+cp ~/.claude/settings.json ~/Developer/Personal/my-mac-dev-setup/config/claude/
 ```
 
 ## 💡 最佳實踐
 
 1. **定期備份**：修改 settings.json 後記得備份
    ```bash
-   cp ~/.claude/settings.json ~/personal/mac-dev-setup/config/claude/
+   cp ~/.claude/settings.json ~/Developer/Personal/my-mac-dev-setup/config/claude/
    git add config/claude/settings.json
    git commit -m "Update Claude settings"
    ```
@@ -84,14 +84,14 @@ cp ~/.claude/settings.json ~/personal/mac-dev-setup/config/claude/
 
 ```bash
 # 1. Clone repo
-git clone https://github.com/u88803494/my-mac-dev-setup.git ~/personal/mac-dev-setup
+git clone https://github.com/u88803494/my-mac-dev-setup.git ~/Developer/Personal/my-mac-dev-setup
 
 # 2. 安裝 SuperClaude
 pipx install SuperClaude
 SuperClaude install  # 互動式選擇組件和 MCP servers
 
 # 3. 恢復個人設定
-cp ~/personal/mac-dev-setup/config/claude/settings.json ~/.claude/settings.json
+cp ~/Developer/Personal/my-mac-dev-setup/config/claude/settings.json ~/.claude/settings.json
 
 # 完成！
 ```

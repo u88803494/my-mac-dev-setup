@@ -9,7 +9,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo "🔗 Setting up zsh-scripts symlinks"
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 
-ZSH_SCRIPTS_REPO="$HOME/personal/zsh-scripts"
+ZSH_SCRIPTS_REPO="${PERSONAL_DIR:-$HOME/Developer/Personal}/zsh-scripts"
 ZSH_CUSTOM="${ZSH_CUSTOM:-$HOME/.oh-my-zsh/custom}"
 
 # Check if zsh-scripts repo exists
@@ -17,7 +17,7 @@ if [ ! -d "$ZSH_SCRIPTS_REPO" ]; then
     echo "❌ Error: zsh-scripts repository not found at $ZSH_SCRIPTS_REPO"
     echo ""
     echo "📥 Please clone the repository first:"
-    echo "   git clone https://github.com/YOUR_USERNAME/zsh-scripts.git ~/personal/zsh-scripts"
+    echo "   git clone git@github.com:u88803494/zsh-scripts.git \"$ZSH_SCRIPTS_REPO\""
     echo ""
     exit 1
 fi

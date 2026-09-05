@@ -1,227 +1,153 @@
 # 常用命令建議
 
+> 最後校對：2026-09-05
+
 ## 安裝命令
 
-### 完整安裝
+### AI 路徑（主線）
 ```bash
-# 完整安裝（建議新機器使用）
+claude "Read MIGRATION_PLAN.md and SETUP_PROMPT.md, then execute the setup"
+```
+
+### 傳統手動路徑（備援）
+```bash
 ./setup.sh
 ```
 
 ### 模組化安裝
 ```bash
-# 核心環境
-./scripts/brew.sh          # Homebrew + pnpm
-./scripts/node.sh          # nvm + Node.js
-./scripts/zsh.sh           # Zsh 環境
-
-# 開發工具
-./scripts/dev-tools.sh     # Git 工具鏈 + 現代化 CLI
-./scripts/apps.sh          # GUI 應用程式
-
-# 配置
-./scripts/iterm2-config.sh # iTerm2 同步
-./git/setup-git.sh         # Git 配置（互動式）
+./scripts/brew.sh              # Homebrew + brew bundle（CLI + GUI apps）
+./scripts/node.sh              # mise 全域設定 + mise install（不是 nvm）
+./scripts/zsh.sh                # Zsh + OMZ + p10k + plugins（不碰 .zshrc 內容）
+./scripts/restore-dotfiles.sh   # 還原 .zshrc / .gitconfig / .p10k.zsh
+./scripts/symlink-zsh.sh        # zsh-scripts symlink
+./scripts/iterm2-config.sh      # iTerm2 同步
+./scripts/macos-defaults.sh     # 系統偏好設定（執行前先跟使用者確認）
+./git/setup-git.sh              # Git 配置（互動式）
 ```
 
-### 可選組件
+## 套件管理
+
 ```bash
-# SuperClaude Framework + MCP servers
-pipx install SuperClaude
-pipx upgrade SuperClaude
-SuperClaude install        # 互動式選擇組件
-
-# 設定 MCP servers 的 API keys（如果需要）
-export TAVILY_API_KEY="your-key"
-export TWENTYFIRST_API_KEY="your-key"
-echo 'export TAVILY_API_KEY="your-key"' >> ~/.zshrc
-echo 'export TWENTYFIRST_API_KEY="your-key"' >> ~/.zshrc
+brew bundle --file=Brewfile              # 安裝
+brew bundle check --file=Brewfile         # 驗證是否都裝齊
+brew bundle dump --file=Brewfile.tmp --force  # 產生目前實機快照（對照用）
 ```
+
+⚠️ 不要對個別套件跑 `brew install`——會跟 Brewfile 這個單一事實來源脫節，
+且下次 `brew bundle cleanup` 會誤判成多餘套件而移除。
 
 ## 測試命令
 
-### 清理以重新測試
 ```bash
-# 移除所有已安裝的組件（用於測試）
-./scripts/cleanup.sh
-
-# 然後重新執行安裝
-./setup.sh
+./scripts/cleanup.sh   # 移除已安裝組件（測試用）
+./setup.sh             # 重新安裝
 ```
 
 ### 驗證命令
 ```bash
-# 檢查安裝
 brew --version
-pnpm --version
+mise --version
 node --version
+pnpm --version
 git --version
 eza --version
 zoxide --version
-
-# 檢查 Git 配置
 git config --global user.name
 git config --global user.email
-
-# 檢查 SuperClaude
-SuperClaude --version
 ```
 
 ## 配置備份
 
-### iTerm2
-```bash
-# 配置會自動同步到 config/iterm2/
-# 無需手動備份
-
-# 手動檢查同步位置
-defaults read com.googlecode.iterm2 PrefsCustomFolder
-```
-
 ### SuperClaude 設定
 ```bash
-# 備份當前設定到 repo
-cp ~/.claude/settings.json ~/personal/mac-dev-setup/config/claude/
-
-# 從 repo 恢復設定
-cp ~/personal/mac-dev-setup/config/claude/settings.json ~/.claude/
+cp ~/.claude/settings.json ~/Developer/Personal/my-mac-dev-setup/config/claude/
+cp ~/Developer/Personal/my-mac-dev-setup/config/claude/settings.json ~/.claude/
 ```
 
-### Zsh 配置
+### Zsh 配置（zsh-scripts，獨立 repo）
 ```bash
-# 編輯自訂 aliases（在獨立 repo）
-cd ~/personal/zsh-scripts
+cd ~/Developer/Personal/zsh-scripts
 vim custom.plugin.zsh
 git commit && git push
-
-# 重新載入配置
 source ~/.zshrc
+```
+
+### dotfiles（config/shell/）
+```bash
+# 有調整 ~/.zshrc 之後，想更新回 repo：
+cp ~/.zshrc ~/Developer/Personal/my-mac-dev-setup/config/shell/.zshrc
 ```
 
 ## Git 操作
 
-### 設定 Git 配置
 ```bash
-./git/setup-git.sh
-# 選擇：1) 個人  2) 工作  3) 手動
+./git/setup-git.sh   # 選擇：1) 個人 2) 工作 3) 手動
 ```
 
-### 提交變更
-```bash
-# 標準流程
-git add .
-git commit -m "描述"
-git push
-
-# 添加新檔案
-git add config/claude/settings.json
-git commit -m "更新 Claude 設定"
-```
-
-## 有用的 Shell 函式（安裝後可用）
-
-這些在設定完成後會自動可用：
+## 有用的 Shell 函式（zsh-scripts，安裝後可用）
 
 ```bash
-# 樹狀檢視並複製到剪貼簿
-t                          # 當前目錄樹
-
-# 智能目錄跳轉（從使用中學習）
-j <dir>                    # 跳到常用目錄
-
-# 快速命令（來自 zsh-scripts repo）
-c                          # 啟動 Claude Code
-cls                        # 清除畫面
-uuid                       # 生成 UUID（小寫，複製到剪貼簿）
+t                  # 樹狀檢視並複製到剪貼簿
+j <dir>            # 智能目錄跳轉
+c                  # 啟動主帳號 Claude Code
+cc                 # 啟動第二個 Claude 帳號（CLAUDE_CONFIG_DIR=~/.claude-alt）
+claude-sync-mcp    # 同步主帳號 mcpServers 到 cc 共用設定
+a                  # 開啟 Antigravity IDE
+cls                # 清除畫面
+uuid               # 生成 UUID（小寫，複製到剪貼簿）
 ```
 
 ## macOS 特定命令
 
-### Homebrew
 ```bash
-# 更新 Homebrew
-brew update
-
-# 升級套件
-brew upgrade
-
-# 列出已安裝的套件（僅直接安裝）
-brew leaves
-
-# 搜尋套件
-brew search <名稱>
-```
-
-### 系統資訊
-```bash
-# 檢查架構（Intel vs Apple Silicon）
-uname -m                   # arm64 = Apple Silicon, x86_64 = Intel
-
-# macOS 版本
-sw_vers
+uname -m            # arm64 = Apple Silicon, x86_64 = Intel
+sw_vers              # macOS 版本
+brew leaves           # 列出直接安裝的套件（僅 formulae，不含 cask）
 ```
 
 ## 疑難排解
 
 ### Powerlevel10k 配置
 ```bash
-# 重新執行配置精靈
-p10k configure
-
-# 使用 repo 的預先配置版本
-# （已自動套用）
+p10k configure   # 重新執行配置精靈（repo 的預先配置版本已自動套用）
 ```
 
 ### iTerm2 配置未載入
 ```bash
-./scripts/iterm2-config.sh
-# 然後重啟 iTerm2
+./scripts/iterm2-config.sh   # 然後重啟 iTerm2
 ```
 
-### Zsh Scripts 找不到
+### 自訂 alias（c/cc/j/t()）沒有生效
+先確認兩個 symlink 都存在，再懷疑 `.zshrc`：
 ```bash
-# 先 clone zsh-scripts repo
-git clone https://github.com/u88803494/zsh-scripts.git ~/personal/zsh-scripts
-
-# 然後執行 symlink 腳本
+ls -la ~/.oh-my-zsh/custom/zsh-scripts
+ls -la ~/.oh-my-zsh/custom/custom.plugin.zsh
+# 都沒有就重跑
 ./scripts/symlink-zsh.sh
 ```
 
-### SuperClaude 問題
-```bash
-# 檢查版本
-SuperClaude --version
-
-# 重新安裝組件
-SuperClaude install
-
-# 檢查 MCP server 狀態（在 Claude Code 中）
-# 查看是否有缺少 API keys 的錯誤
-```
+### mise 裝的工具（例如 uv）沒出現
+`bootstrap.sh` 的 `mise use -g node@lts` 會搶先建立一份沒有 `uv` 的
+`~/.config/mise/config.toml`。確認有跑過 `scripts/node.sh`（它會用
+`config/mise/config.toml` 覆寫並重新 `mise install`），而不是假設
+bootstrap 階段就已經處理好全部工具。
 
 ## 開發工作流程
 
 ### 進行變更
 1. 編輯腳本或配置
-2. 用 `./scripts/cleanup.sh` 然後個別腳本測試
-3. 提交變更到 git
-4. 推送到 GitHub
+2. `./scripts/cleanup.sh` 然後個別腳本測試
+3. 若同時改了 `SETUP_PROMPT.md` 對應段落，確認兩邊沒有分岔
+4. 提交變更到 git，推送到 GitHub
 
-### 添加新工具
-1. 決定：核心（scripts/）或可選（僅 README.md）
-2. 添加到適當的腳本（例如 `dev-tools.sh`）
-3. 更新 `cleanup.sh` 以移除它
-4. 更新 README.md 文檔
+### 添加新套件
+1. 加進 `Brewfile`（不要在腳本裡個別 `brew install`）
+2. 更新 README.md「安裝內容」區段
+3. 若是 Zsh 相關，確認 `config/shell/.zshrc` 的 `plugins=()` 跟
+   `scripts/zsh.sh` 的安裝方式一致
 
-### 同步配置
-```bash
-# iTerm2：自動（無需動作）
-
-# SuperClaude：手動
-cp ~/.claude/settings.json config/claude/
-
-# 提交並推送
-git add config/
-git commit -m "更新配置"
-git push
-```
+### 這個 repo 的架構有重大變動時
+1. 同步更新這幾份 `.serena/memories/`——它們會在新機透過 Serena MCP
+   啟動時被載入，內容落後會直接誤導 AI（曾經發生過 nvm/mise 矛盾的實例）
+2. 更新 `MIGRATION_PLAN.md` §6

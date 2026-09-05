@@ -4,6 +4,20 @@
 
 ---
 
+## 🧳 要換新電腦？
+
+**先讀 [MIGRATION_PLAN.md](./MIGRATION_PLAN.md)。**
+
+這份 README 講的是「新機怎麼裝」，但換機的風險幾乎都在**舊機這一端**：
+沒推上去的 code、沒備份的秘密、沒反啟用的授權。遷移計劃涵蓋：
+
+- §1 遷移前檢查（未推送的 repo、設定匯出、秘密收攏、軟體反啟用）
+- §2 舊機技術債清單（哪些東西**刻意不要**帶到新機）
+- §3 新機安裝順序
+- §5 驗收清單
+
+---
+
 ## 🎯 快速開始（新方式）
 
 在全新的 Mac 上，只需 **一條命令** + **AI 接手**：
@@ -13,8 +27,8 @@
 curl -fsSL https://raw.githubusercontent.com/u88803494/my-mac-dev-setup/main/bootstrap.sh | bash
 
 # 2. Clone 此 repo
-git clone https://github.com/u88803494/my-mac-dev-setup.git ~/personal/mac-dev-setup
-cd ~/personal/mac-dev-setup
+git clone https://github.com/u88803494/my-mac-dev-setup.git ~/Developer/Personal/my-mac-dev-setup
+cd ~/Developer/Personal/my-mac-dev-setup
 
 # 3. 讓 Claude Code AI 完成剩下的設定（5 分鐘）
 claude "Read SETUP_PROMPT.md and execute all steps, asking for confirmation before major changes"
@@ -100,15 +114,20 @@ Claude Code 讀取 `SETUP_PROMPT.md` 並執行：
 curl -fsSL https://raw.githubusercontent.com/u88803494/my-mac-dev-setup/main/bootstrap.sh | bash
 
 # 2. Clone repo
-git clone https://github.com/u88803494/my-mac-dev-setup.git ~/personal/mac-dev-setup
-cd ~/personal/mac-dev-setup
+git clone https://github.com/u88803494/my-mac-dev-setup.git ~/Developer/Personal/my-mac-dev-setup
+cd ~/Developer/Personal/my-mac-dev-setup
 
-# 3. 執行個別腳本
-./scripts/zsh.sh           # Shell 環境
-./scripts/dev-tools.sh     # 開發工具
-./scripts/apps.sh          # GUI 應用
-./scripts/symlink-zsh.sh   # zsh-scripts
-./scripts/iterm2-config.sh # iTerm2 配置
+# 3. 一鍵執行全部
+./setup.sh
+
+# 或執行個別腳本
+./scripts/brew.sh            # Homebrew + Brewfile（CLI + GUI apps）
+./scripts/node.sh            # mise + Node.js
+./scripts/zsh.sh             # Shell 環境
+./scripts/restore-dotfiles.sh # .zshrc / .gitconfig / .p10k.zsh
+./scripts/symlink-zsh.sh     # zsh-scripts
+./scripts/iterm2-config.sh   # iTerm2 配置
+./scripts/macos-defaults.sh  # macOS 系統偏好設定
 
 # 4. 配置 Git
 ./git/setup-git.sh
@@ -121,26 +140,42 @@ cd ~/personal/mac-dev-setup
 ## 📁 目錄結構
 
 ```
-mac-dev-setup/
+my-mac-dev-setup/
+├── MIGRATION_PLAN.md            # 🆕 新電腦遷移計劃（遷移前必讀）
+├── Brewfile                     # 🆕 新機目標套件清單（curated）
+├── Brewfile.old-machine         # 🆕 舊機原樣快照（參考用）
 ├── bootstrap.sh                 # 最小化安裝（Homebrew → mise → Node → Claude Code）
-├── SETUP_PROMPT.md             # AI 配置指令（Claude Code 讀取）
-├── README.md                   # 本文件
-├── .gitignore
+├── setup.sh                     # 一鍵執行全部腳本
+├── SETUP_PROMPT.md              # AI 配置指令（Claude Code 讀取）
+├── README.md
 ├── config/
-│   ├── .p10k.zsh              # Powerlevel10k 預配置
-│   ├── iterm2/                # iTerm2 配置同步
+│   ├── .p10k.zsh                # Powerlevel10k 預配置
+│   ├── shell/                   # 🆕 dotfiles
+│   │   ├── .zshrc               #   新機乾淨版
+│   │   ├── .zshrc.old-machine   #   舊機原樣（含已淘汰的 PATH）
+│   │   ├── .zshrc.local.example #   秘密範本（只有 key 名稱）
+│   │   ├── .zprofile
+│   │   ├── .gitconfig
+│   │   └── .gitignore_global
+│   ├── vscode/                  # 🆕 VS Code
+│   │   ├── settings.json
+│   │   ├── extensions.txt
+│   │   └── snippets/
+│   ├── mise/config.toml         # 🆕 全域版本設定
+│   ├── iterm2/
 │   │   └── com.googlecode.iterm2.plist
-│   └── claude/                # SuperClaude 個人設定
-│       └── settings.json
-├── scripts/                    # 備用：傳統腳本
+│   └── claude/                  # SuperClaude 個人設定
+├── scripts/
+│   ├── brew.sh                  # Homebrew + brew bundle
+│   ├── node.sh                  # mise（已不再使用 nvm）
 │   ├── zsh.sh
-│   ├── dev-tools.sh
-│   ├── apps.sh
+│   ├── restore-dotfiles.sh      # 🆕
 │   ├── symlink-zsh.sh
 │   ├── iterm2-config.sh
+│   ├── macos-defaults.sh        # 🆕
 │   └── cleanup.sh
 └── git/
-    ├── setup-git.sh           # 互動式 Git 配置
+    ├── setup-git.sh
     ├── .gitconfig.personal
     └── .gitconfig.work
 ```
@@ -168,11 +203,11 @@ mise use -g node@22
 mise use -g python@3.12
 
 # 專案級設定（自動切換）
-cd ~/work/project-a
+cd ~/Developer/Work/project-a
 mise use node@18        # 建立 .mise.toml
 node --version          # v18.x
 
-cd ~/personal/project-b
+cd ~/Developer/Personal/project-b
 mise use node@22
 node --version          # v22.x（自動切換！）
 ```
@@ -183,7 +218,12 @@ node --version          # v22.x（自動切換！）
 
 ### .zshrc.local（推薦方式）
 
-AI 會自動建立 `~/.zshrc.local` 用於存放 API Keys：
+從 `config/shell/.zshrc.local.example` 複製後填值（範本只含 key 名稱，不含實際值）：
+
+```bash
+cp config/shell/.zshrc.local.example ~/.zshrc.local
+chmod 600 ~/.zshrc.local
+```
 
 ```bash
 # ~/.zshrc.local（不會 commit 到 git）
@@ -211,7 +251,7 @@ export SUPABASE_ACCESS_TOKEN="your-token"
 ### zsh-scripts
 - 獨立 repository 管理
 - 透過 symlink 連結到 Oh My Zsh
-- 更新：`cd ~/personal/zsh-scripts && git pull`
+- 更新：`cd ~/Developer/Personal/zsh-scripts && git pull`
 
 ---
 
@@ -316,7 +356,7 @@ brew install pipx uv
 ### Q: zsh-scripts repo 不存在怎麼辦？
 **A**: AI 會自動 clone。如果失敗，手動執行：
 ```bash
-git clone https://github.com/u88803494/zsh-scripts.git ~/personal/zsh-scripts
+git clone https://github.com/u88803494/zsh-scripts.git ~/Developer/Personal/zsh-scripts
 ```
 
 ### Q: 想重新配置 Powerlevel10k

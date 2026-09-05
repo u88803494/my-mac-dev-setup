@@ -1,5 +1,25 @@
 # 設計決策與理由
 
+> 最後校對：2026-09-05——下面標記「⚠️ 已過時」的段落是決策當時的紀錄，
+> 保留是為了理解演變過程，但**內容本身不再反映現況**，不要照著執行。
+
+## 0. AI-first 兩階段架構（決策日期：2026-09-05，取代下方部分舊決策）
+
+**決策**：`bootstrap.sh`（最小化：Homebrew → Claude Code → mise/Node → git）
+→ `SETUP_PROMPT.md`（AI 主導剩餘設定）成為主線；`setup.sh` 降級為備援路徑。
+
+**理由**：使用者換機後主要就是直接裝 Claude Code CLI，讓它自主讀
+`SETUP_PROMPT.md` 執行，而不是自己跑傳統腳本。
+
+**連帶決策**：
+- 版本管理只用 **mise**，不裝 **nvm**（下方「核心環境」提到 nvm 的地方已過時）
+- `Brewfile` 取代個別 `brew install` 呼叫，成為套件的單一事實來源
+- Claude Code 改用 `brew cask` 安裝，不用 `npm install -g`
+- VS Code extensions **已經**匯出到 `config/vscode/extensions.txt`（見下方
+  第 10 點「不管理 VS Code 擴充套件」——那則決策已被推翻，現在有匯出但
+  安裝與否仍由使用者自行決定，不會被 Brewfile 強制套用）
+- Python 工具 `pipx` 已在 Brewfile 取消註解（第 6 點已過時，見下方標註）
+
 ## 架構決策
 
 ### 1. 模組化腳本設計（核心理念）
@@ -90,7 +110,11 @@ defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
 - 個人設定（權限、API keys、路徑）穩定
 - 關注點分離：框架 vs. 使用者偏好
 
-### 6. Python 工具預設註解
+### 6. Python 工具預設註解 ⚠️ 已過時（見上方第 0 點）
+`pipx` 現在已在 `Brewfile` 取消註解（SuperClaude 需要）；`uv` 改由
+`config/mise/config.toml` 的 mise 全域工具管理，不是 Homebrew。
+
+原始決策紀錄（僅供參考）：
 **決策**：在 `brew.sh` + Brewfile 中註解 `pipx` 和 `uv`
 
 **理由**：
@@ -154,7 +178,12 @@ defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
 
 **權衡**：需要先手動 clone `zsh-scripts` repo
 
-### 10. 不管理 VS Code 擴充套件
+### 10. 不管理 VS Code 擴充套件 ⚠️ 已過時（見上方第 0 點）
+現在 `config/vscode/extensions.txt` + `settings.json` 已匯出進 repo（換機時
+省得重新一個個裝），但不透過 Brewfile 強制安裝，安裝與否仍由使用者決定——
+原本「太個人化、變動頻繁」的理由依然成立，只是換成「匯出但不強制」的折衷。
+
+原始決策紀錄（僅供參考）：
 **決策**：不管理 VS Code 擴充套件
 
 **理由**：
@@ -165,28 +194,25 @@ defaults write com.googlecode.iterm2 LoadPrefsFromCustomFolder -bool true
 
 **替代方案**：使用者可以使用 VS Code Settings Sync
 
-### 11. iTerm2 字型建議（非自動化）
-**決策**：說明字型需求，但不在 iTerm2 中自動選擇
-
-**建議字型**：MesloLGS NF（給 Powerlevel10k 用）
-
-**理由**：
-- 透過 Zsh 腳本自動安裝
-- 字型選擇是個人偏好
-- iTerm2 可能有現有字型設定
-- 手動選擇很簡單（一次性設定）
-
-**文檔**：在 README 提示區段註記
+### 11. iTerm2 字型 ⚠️ 部分過時（安裝方式已變）
+`font-meslo-lg-nerd-font` 現在由 **Brewfile** 統一安裝（cask），不是
+`scripts/zsh.sh`（`zsh.sh` 已改為不重複裝字型，見 codebase_structure.md）。
+iTerm2 本身仍需手動選字型，這部分決策不變。
 
 ## 未來考量
 
+### 已完成（原本列在「可能的添加」）
+- ✅ macOS 系統偏好設定自動化 → `scripts/macos-defaults.sh`
+- ✅ Brewfile 用於確切套件版本 → `Brewfile`
+
 ### 可能的添加
-- macOS 系統偏好設定自動化（需要研究）
-- Brewfile 用於確切套件版本
 - 多個環境配置檔（最小、完整、開發特定）
 
 ### 明確不計劃
 - Linux 支援（需要時獨立專案）
 - IDE 特定配置（太個人化）
-- 自動化 VS Code 擴充套件管理
 - 雲端配置同步（git 已足夠）
+
+### 部分調整
+- VS Code 擴充套件：清單已匯出（`config/vscode/`），但**不**透過
+  Brewfile 強制安裝，見第 10 點

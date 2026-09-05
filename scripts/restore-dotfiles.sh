@@ -29,8 +29,15 @@ restore() {
             echo "✅ $name 已是最新"
             return
         fi
-        cp "$dst" "$dst.pre-migration"
-        echo "💾 既有 $name 已備份為 $name.pre-migration"
+        # 只在第一次備份 — 若這支腳本被重跑第二次（例如今天跑一半、
+        # 明天繼續，中途又手動改過家目錄的檔案），固定檔名的備份會被
+        # 覆蓋掉，永久遺失最原始的版本。.pre-migration 已存在就不再動它。
+        if [ ! -f "$dst.pre-migration" ]; then
+            cp "$dst" "$dst.pre-migration"
+            echo "💾 既有 $name 已備份為 $name.pre-migration"
+        else
+            echo "ℹ️  $name.pre-migration 已存在，保留原始備份不覆蓋"
+        fi
     fi
 
     cp "$src" "$dst"

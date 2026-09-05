@@ -18,5 +18,16 @@
 .env.local
 *.env.local
 
+# SSH / cloud credentials（防手滑複製進 repo）
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+*.pem
+*.key
+.aws/
+.config/rclone/
+credentials.json
+
 # Setup reports
 setup-report.md

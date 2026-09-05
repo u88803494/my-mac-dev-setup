@@ -21,16 +21,20 @@ fi
 eval "$(mise activate bash)"
 
 # 還原全域版本設定
+#
+# repo 的 config/mise/config.toml 是單一事實來源（例如含 uv）。
+# bootstrap.sh 會先跑 `mise use -g node@lts` 建立一份只有 node/pnpm 的
+# ~/.config/mise/config.toml——如果這裡遇到已存在就跳過，repo 版本的
+# 內容（uv 等）就永遠不會被套用，且不會有任何錯誤訊息。
+# 所以這裡改成：一律以 repo 版本覆寫，既有檔案只在第一次備份一次。
 mkdir -p ~/.config/mise
 if [ -f "$SCRIPT_DIR/config/mise/config.toml" ]; then
-    if [ -f ~/.config/mise/config.toml ]; then
-        echo "⚠️  ~/.config/mise/config.toml 已存在，跳過覆寫"
-        echo "   repo 版本內容："
-        cat "$SCRIPT_DIR/config/mise/config.toml"
-    else
-        cp "$SCRIPT_DIR/config/mise/config.toml" ~/.config/mise/config.toml
-        echo "✅ 已還原 mise 全域設定"
+    if [ -f ~/.config/mise/config.toml ] && [ ! -f ~/.config/mise/config.toml.pre-migration ]; then
+        cp ~/.config/mise/config.toml ~/.config/mise/config.toml.pre-migration
+        echo "💾 既有設定已備份為 config.toml.pre-migration"
     fi
+    cp "$SCRIPT_DIR/config/mise/config.toml" ~/.config/mise/config.toml
+    echo "✅ 已套用 repo 版本的 mise 全域設定"
 fi
 
 echo ""

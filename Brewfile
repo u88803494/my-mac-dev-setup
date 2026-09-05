@@ -30,6 +30,17 @@ brew "eza"                # ls 替代，zsh-scripts 的 t() 需要
 brew "zoxide"             # 智慧 cd，.zshrc 的 j alias 需要
 brew "fzf"
 
+# ⚠️ 不要在這裡加 `brew "zsh"`：
+#   系統內建 /bin/zsh 已經是 macOS 預設 shell、已在 /etc/shells，
+#   且是舊機實際使用的版本（`brew leaves` 裡從來沒有 zsh）。
+#   多裝一份 Homebrew zsh 會讓 `which zsh` 解析到 /opt/homebrew/bin/zsh，
+#   而這個路徑不在 /etc/shells 裡，會讓 scripts/zsh.sh 的 chsh 步驟直接失敗。
+#
+# zsh-autosuggestions / zsh-syntax-highlighting 也不要用 brew 裝：
+#   舊機是用 git clone 進 $ZSH_CUSTOM/plugins/（OMZ 的 plugins=() 陣列
+#   只認得custom/plugins 底下的目錄，不會自動抓 brew 的 share 路徑），
+#   見 scripts/zsh.sh。
+
 # ─────────────────────────────────────────────
 # 常用 CLI
 # ─────────────────────────────────────────────

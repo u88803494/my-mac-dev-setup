@@ -100,8 +100,11 @@ defaults export com.googlecode.iterm2 config/iterm2/com.googlecode.iterm2.plist
 
 - [ ] `~/.zshrc.local` — `MORPH_API_KEY`、`SUPABASE_ACCESS_TOKEN`、`TAVILY_API_KEY`、`PERSONAL_DIR`、`WORK_DIR`
 - [ ] `GEMINI_API_KEY`（my-website 開發需要，目前只在 Vercel／專案 `.env.local`）
-- [ ] `~/.ssh/id_ed25519` + `.pub`（GitHub 用）→ **建議在新機重新產生一把新 key**，舊 key 從 GitHub 移除
-- [ ] `gh` token（存在 keyring）→ 新機直接 `gh auth login` 重新登入即可，不用搬
+- [ ] `~/.ssh/id_ed25519` + `.pub`（GitHub 用）→ 新機重新產生一把新 key。
+      **舊 key 何時移除見 §3 步驟 12——不要在這階段先手動去 GitHub 刪，
+      要等新機驗證新 key 可用之後才刪，避免兩台機器同時 push 不了的空窗期**
+- [ ] `gh` token（存在 keyring）→ 新機直接 `gh auth login` 重新登入即可，不用搬；
+      舊機那把 token 建議在確認不再使用舊機後跑 `gh auth logout` 主動撤銷
 - [ ] `~/.aws/`、`~/.config/rclone/`（rclone 設定含雲端 token）
 - [ ] 各專案的 `.env.local`（不在 git 內）→ 逐一收集
 - [ ] macOS Keychain：**不整包搬**，用密碼管理器逐項重建
@@ -115,6 +118,11 @@ defaults export com.googlecode.iterm2 config/iterm2/com.googlecode.iterm2.plist
 - [ ] `~/EVPlayer2_download` 440M（825 個檔案 → 確認後放棄）
 - [ ] pCloud（`~/.pcloud` symlink 指向 `/Volumes/HPSSD/.pcloud`）→ 確認雲端已同步完成
 - [ ] Obsidian vault、Logseq（`~/.logseq` 18M）位置確認
+- [ ] **HPSSD 本身是否已加密**（這裡會暫存護照/簽證掃描檔）：
+      ```bash
+      diskutil apfs list /Volumes/HPSSD   # 檢查 FileVault/加密狀態
+      # 未加密就跑：diskutil apfs encryptVolume /Volumes/HPSSD
+      ```
 
 ### 1.5 反啟用 / 登出（**遷移前做，事後很麻煩**）
 
@@ -122,9 +130,14 @@ defaults export com.googlecode.iterm2 config/iterm2/com.googlecode.iterm2.plist
 - [ ] NordVPN、VPN Proxy Master：確認裝置數上限，登出舊機
 - [ ] Steam / Epic：登出（Steam 3.1G 遊戲資料不用搬，重下載）
 - [ ] iCloud「尋找」→ 關閉，避免新機啟用鎖問題（Activation Lock 目前為 Enabled）
+- [ ] **Apple ID → 這台 Mac 從「登入的裝置」清單移除**（不只是關掉尋找——
+      設定 → 使用者 Apple ID → 往下找到裝置清單，主動撤銷這台的信任關係）
 - [ ] iMessage / FaceTime 登出
 - [ ] Signal：先在新機做**裝置連結**，別直接抹掉舊機
 - [ ] LINE：確認已綁定 email／電話，聊天記錄先備份
+- [ ] pCloud（或其他雲端硬碟）的「已連結裝置」管理介面撤銷這台機器的存取
+- [ ] 瀏覽器（Chrome/Firefox）已登入的 Google/Microsoft 帳號 session 登出，
+      尤其若密碼是存在瀏覽器內建密碼庫而非獨立密碼管理器
 
 ### 1.6 最後一次完整備份
 
@@ -204,13 +217,21 @@ rsync -av --progress ~/Documents ~/Desktop ~/Pictures ~/Movies /Volumes/HPSSD/ma
    - 螢幕鎖定、Touch ID、FileVault 開啟
 4. 安裝 Rosetta（若有 Intel-only app）：softwareupdate --install-rosetta
 5. Xcode Command Line Tools：xcode-select --install
-6. Homebrew
-7. 本 repo 的 bootstrap.sh
+6. 本 repo 的 bootstrap.sh（Homebrew → Claude Code → mise/Node → git，
+   一支腳本做完，不用另外手動裝 Homebrew）
+7. clone 本 repo，讓 Claude Code 讀 SETUP_PROMPT.md 接手（見 README）
 8. Brewfile 還原：brew bundle --file=Brewfile
 9. Oh My Zsh + Powerlevel10k + plugins + zsh-scripts
 10. 還原 dotfiles（symlink 方式）
-11. mise install（node 22 + uv）
-12. SSH key 新產生 → 加到 GitHub → gh auth login
+11. mise install（node 22 + uv，透過 scripts/node.sh 覆寫 bootstrap 產生的
+    初版 mise 設定——bootstrap 那次不含 uv）
+12. **SSH key 輪替（三步驟，每步都要等上一步驗證通過）：**
+    1. `ssh-keygen -t ed25519 -C "u88803494@gmail.com"` → `gh auth login`
+       → `gh ssh-key add ~/.ssh/id_ed25519.pub`
+    2. **驗證**：`ssh -T git@github.com` 成功，且對至少一個私有 repo
+       `git pull` 成功
+    3. 確認步驟 2 通過後，才去 GitHub Settings → SSH Keys 移除舊機那把 key
+       （不要提前做——順序顛倒會造成兩台機器同時 push 不了的空窗期）
 13. clone 需要的 repos（不要一次全 clone）
 14. VS Code 登入 Settings Sync 或還原 extensions.txt
 15. Claude Code：還原 ~/.claude 設定與 memory、重新登入雙帳號
@@ -243,6 +264,14 @@ rsync -av --progress ~/Documents ~/Desktop ~/Pictures ~/Movies /Volumes/HPSSD/ma
 - [ ] VS Code extensions 齊全、Prettier/ESLint 正常運作
 - [ ] iTerm2 設定（字型 MesloLGS NF、配色）正確
 - [ ] Time Machine 指向新的備份目的地
+
+**新機穩定運作一段時間後（例如兩週內沒再回頭查舊機資料），回來清理本 repo：**
+
+- [ ] 移除 `Brewfile.old-machine`、`config/shell/.zshrc.old-machine`
+      ——這兩份是這次遷移的一次性快照，長期留著只會變成「誰都看不懂為何
+      存在」的死檔案，尤其下次換機時它們描述的是**這次**的舊機，不是
+      屆時的舊機
+- [ ] 確認 `.serena/memories/` 反映的是遷移後的最終狀態
 
 ---
 

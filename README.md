@@ -173,8 +173,6 @@ my-mac-dev-setup/
 │   ├── symlink-zsh.sh
 │   ├── iterm2-config.sh
 │   ├── macos-defaults.sh        # 🆕
-│   ├── backup-claude.sh
-│   ├── restore-claude.sh
 │   └── cleanup.sh
 └── git/
     ├── setup-git.sh

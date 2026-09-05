@@ -29,7 +29,7 @@ them — do not treat them as a routine step to execute and move on:**
 - `ssh-keygen` / anything that touches `~/.ssh/` (may overwrite an existing key)
 - `gh auth login` (changes GitHub CLI identity)
 - Writing to `~/.zshrc.local` when it already has real content (never overwrite
-  silently — see Task 3)
+  silently — see Task 4)
 - `bash scripts/macos-defaults.sh` (changes Dock/Finder/keyboard/screenshot
   system settings)
 
@@ -52,11 +52,27 @@ requires the user's login password typed interactively** — if this script paus
 or the shell isn't already `/bin/zsh`, hand control back to the user rather than
 trying to script around it.
 
-This script does **not** touch `~/.zshrc` content — that's Task 3's job.
+This script does **not** touch `~/.zshrc` content — that's Task 4's job.
 
 ---
 
-### 2. Development Tools & GUI Applications (Brewfile)
+### 2. Apply the repo's mise version-manager config
+
+```bash
+bash scripts/node.sh
+```
+
+`bootstrap.sh` already ran `mise use -g node@lts` and `mise use -g pnpm@latest`,
+which creates a bare `~/.config/mise/config.toml` containing only node and
+pnpm — **no `uv`**. This script overwrites that file with the repo's
+`config/mise/config.toml` (the single source of truth) and re-runs
+`mise install`. **Do not skip this step** — if you do, `uv` never gets
+installed and there is no error message to tell you that; it just silently
+never shows up.
+
+---
+
+### 3. Development Tools & GUI Applications (Brewfile)
 
 Everything — CLI tools, casks, and VS Code extensions — comes from one file:
 
@@ -72,7 +88,7 @@ scanning the install log by eye.
 
 ---
 
-### 3. Restore dotfiles
+### 4. Restore dotfiles
 
 ```bash
 bash scripts/restore-dotfiles.sh
@@ -105,7 +121,7 @@ leave placeholder values and treat the step as done.**
 
 ---
 
-### 4. Custom scripts (zsh-scripts)
+### 5. Custom scripts (zsh-scripts)
 
 ```bash
 mkdir -p ~/Developer/Personal
@@ -126,7 +142,7 @@ no error to indicate why.
 
 ---
 
-### 5. iTerm2 preferences sync
+### 6. iTerm2 preferences sync
 
 ```bash
 bash scripts/iterm2-config.sh
@@ -134,7 +150,7 @@ bash scripts/iterm2-config.sh
 
 ---
 
-### 6. Verification
+### 7. Verification
 
 ```bash
 echo "🔍 Verifying installation..."
@@ -214,7 +230,7 @@ echo "✅ Verification complete!"
 **Common issues:**
 
 - **Plugins not loading**: check `$ZSH_CUSTOM/zsh-scripts` and
-  `$ZSH_CUSTOM/custom.plugin.zsh` both exist as symlinks (see Task 4) before
+  `$ZSH_CUSTOM/custom.plugin.zsh` both exist as symlinks (see Task 5) before
   assuming it's a `.zshrc` problem
 - **Command not found**: check if the tool is in PATH — a fresh Homebrew
   install only persists to PATH via `~/.zprofile`; opening a new terminal tab

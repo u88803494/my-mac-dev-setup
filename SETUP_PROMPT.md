@@ -162,6 +162,7 @@ echo ""
 echo "Languages and tools:"
 node --version
 pnpm --version
+uv --version
 echo ""
 echo "Development tools:"
 git --version

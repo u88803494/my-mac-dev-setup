@@ -85,13 +85,10 @@ cask "obsidian"
 cask "postman"
 cask "signal"
 cask "adguard"
-cask "nordvpn"
 cask "aldente"                   # 電池充電上限
 cask "monitorcontrol"            # 外接螢幕亮度
 cask "cold-turkey-blocker"       # 專注／封鎖
 cask "iina"
-cask "qbittorrent"
-cask "microsoft-office"
 
 # ─────────────────────────────────────────────
 # 系統工具（2026-09 新機評估後加入）

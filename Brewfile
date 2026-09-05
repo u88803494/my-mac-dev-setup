@@ -94,6 +94,14 @@ cask "qbittorrent"
 cask "microsoft-office"
 
 # ─────────────────────────────────────────────
+# 系統工具（2026-09 新機評估後加入）
+# ─────────────────────────────────────────────
+cask "raycast"                   # Spotlight 加強版，內建視窗管理／剪貼簿歷史
+cask "appcleaner"                # 解除安裝時順便清殘留檔案，對治舊機硬碟爆滿問題
+cask "stats"                     # 選單列系統監控，取代舊機重複裝的 RunCat+RunCatNeo
+cask "localsend"                 # 開源版 AirDrop，跨裝置傳檔（含跟另一台 Mac 傳大檔）
+
+# ─────────────────────────────────────────────
 # 需確認再裝（舊機有，但先別預設）
 # ─────────────────────────────────────────────
 # cask "amikai/tap/openings-mcp", trusted: true   # 求職 MCP，還在用就解開

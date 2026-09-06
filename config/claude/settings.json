@@ -13,11 +13,11 @@
       "Bash(open:*)",
       "Bash(tree:*)",
       "Bash(node:*)",
-      "Read(//Users/henry_lee/work/**)",
+      "Read(//Users/henry_lee/Developer/Work/**)",
       "Read(//tmp/**)",
       "Read(//private/tmp/**)",
-      "Write(//Users/henry_lee/work/**)",
-      "Edit(//Users/henry_lee/work/**)",
+      "Write(//Users/henry_lee/Developer/Work/**)",
+      "Edit(//Users/henry_lee/Developer/Work/**)",
       "Glob",
       "Grep",
       "Bash(pnpm run:*)",
@@ -159,5 +159,24 @@
   "enabledMcpjsonServers": [
     "chrome-devtools"
   ],
-  "alwaysThinkingEnabled": true
+  "alwaysThinkingEnabled": true,
+  "hooks": {
+    "UserPromptSubmit": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash -c 'HOUR=$(date +%H); MIN=$(date +%M); HHMM=$((10#$HOUR * 60 + 10#$MIN)); if [ \"$HOUR\" -ge 23 ] || [ \"$HOUR\" -lt 6 ]; then echo \"{\\\"continue\\\": false, \\\"stopReason\\\": \\\"⏰ 夜間時間 (23:00-06:00)。為了你的健康，Claude Code 已鎖定。早安！🌅\\\"}\"; exit 1; elif [ \"$HHMM\" -ge 1350 ]; then echo \"{\\\"continue\\\": true, \\\"systemMessage\\\": \\\"Henry，真的不行了 😅 現在快 23 點了，你應該已經在床上了。新功能可以等到明天，但睡眠不能等。去睡覺！晚安 🌙（緊急或簡短查詢還是可以）\\\"}\"; exit 0; elif [ \"$HOUR\" -eq 22 ]; then echo \"{\\\"continue\\\": true, \\\"systemMessage\\\": \\\"現在已經 22 點多了 😴 睡眠對開發品質很重要，建議明早再深入處理，今晚先睡個好覺吧！\\\"}\"; exit 0; elif [ \"$HOUR\" -eq 21 ]; then echo \"{\\\"continue\\\": true, \\\"systemMessage\\\": \\\"🌙 晚上九點囉，差不多可以開始準備收尾了，23 點會直接鎖定電腦，早點休息喔\\\"}\"; exit 0; else echo \"{\\\"continue\\\": true}\"; exit 0; fi'",
+            "timeout": 5,
+            "statusMessage": "檢查睡眠時間..."
+          }
+        ]
+      }
+    ]
+  },
+  "language": "繁體中文",
+  "theme": "dark",
+  "editorMode": "vim",
+  "remoteControlAtStartup": true,
+  "agentPushNotifEnabled": true
 }

@@ -94,12 +94,19 @@ cp ~/Library/Application\ Support/Code/User/keybindings.json config/vscode/ 2>/d
 cp ~/.zshrc ~/.zprofile ~/.gitconfig ~/.gitignore_global config/shell/
 cp ~/.config/mise/config.toml config/mise/
 defaults export com.googlecode.iterm2 config/iterm2/com.googlecode.iterm2.plist
+cp ~/.claude/settings.json ~/.claude/CLAUDE.md config/claude/   # 見 config/claude/README.md
 ```
+
+⚠️ **2026-09 換機才發現這步之前一直漏掉**：`config/claude/settings.json`（完整權限清單）跟 `CLAUDE.md`（個人規則）早就該匯出，但過去從來沒人真的跑過這行，導致新機的 `~/.claude/` 只剩裸設定，詳細的權限白名單、CLAUDE.md 裡的個人規則全部沒生效。以後每次匯出都不要漏這行。
 
 ### 1.3 秘密與憑證（**不進 git**，用 1Password／密碼管理器或加密隨身碟）
 
-- [ ] `~/.zshrc.local` — `MORPH_API_KEY`、`SUPABASE_ACCESS_TOKEN`、`TAVILY_API_KEY`、`PERSONAL_DIR`、`WORK_DIR`
+- [ ] `~/.zshrc.local` — `MORPH_API_KEY`、`SUPABASE_ACCESS_TOKEN`、`TAVILY_API_KEY`、`TWENTY_FIRST_API_KEY`、`PERSONAL_DIR`、`WORK_DIR`
 - [ ] `GEMINI_API_KEY`（my-website 開發需要，目前只在 Vercel／專案 `.env.local`）
+- [ ] **MCP servers 清單**（不是備份 `~/.claude.json` 本身——`mcpServers` 內嵌明文 API key，不適合搬移／進 git）：
+      記下 `claude mcp list` 目前有哪些 user-scope 的開發用 MCP（2026-09 當時是 `sequential-thinking`／`context7`／`magic`／`playwright`／`serena`／`morphllm-fast-apply`／`tavily`），
+      新機用 `SuperClaude mcp --servers ...` 重新安裝、API key 從密碼管理器重新輸入。
+      實際安裝時踩過的坑見 `config/claude/README.md`「已知問題」章節。
 - [ ] `~/.ssh/id_ed25519` + `.pub`（GitHub 用）→ 新機重新產生一把新 key。
       **舊 key 何時移除見 §3 步驟 12——不要在這階段先手動去 GitHub 刪，
       要等新機驗證新 key 可用之後才刪，避免兩台機器同時 push 不了的空窗期**
@@ -234,7 +241,12 @@ rsync -av --progress ~/Documents ~/Desktop ~/Pictures ~/Movies /Volumes/HPSSD/ma
        （不要提前做——順序顛倒會造成兩台機器同時 push 不了的空窗期）
 13. clone 需要的 repos（不要一次全 clone）
 14. VS Code 登入 Settings Sync 或還原 extensions.txt
-15. Claude Code：還原 ~/.claude 設定與 memory、重新登入雙帳號
+15. **Claude Code / SuperClaude（詳細步驟見 `config/claude/README.md`，2026-09 這次是空白的最大坑）：**
+    1. `pipx install SuperClaude && SuperClaude install --force`（裝 agents + commands/sc）
+    2. 手動複製 core/modes/mcp 三批框架檔到 `~/.claude/`（README 裡有指令，`SuperClaude install` 不會處理這批）
+    3. 還原 `config/claude/settings.json`、`config/claude/CLAUDE.md` 到 `~/.claude/`
+    4. `SuperClaude mcp --servers ...` 重裝 MCP servers（見 §1.3，magic/morphllm-fast-apply/tavily 這三個要繞過 SuperClaude 的 bug，直接呼叫 `claude mcp add`）
+    5. 雙帳號：`ln -sf` 把 `~/.claude-alt/{CLAUDE.md,agents,commands,settings.json}` 連到 `~/.claude/` 對應檔案，`~/.claude-shared/mcp.json` 建好（`jq '{mcpServers: (.mcpServers // {})}' ~/.claude.json`），再 `CLAUDE_CONFIG_DIR="$HOME/.claude-alt" claude` 進去 `/login`
 16. .zshrc.local 還原 API keys
 17. 個人檔案從 HPSSD 選擇性還原
 ```

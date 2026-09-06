@@ -17,6 +17,7 @@ export WORK_DIR="$HOME/Developer/Work"
 # ─────────────────────────────────────────────
 export MORPH_API_KEY=""            # Morphllm MCP
 export TAVILY_API_KEY=""           # Tavily MCP（搜尋）
+export TWENTY_FIRST_API_KEY=""      # Magic MCP（UI 元件生成，取自 https://21st.dev/mcp）
 export SUPABASE_ACCESS_TOKEN=""    # Supabase CLI
 
 # 專案層級的 key 放在各專案的 .env.local，不放這裡：
